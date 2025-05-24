@@ -6,23 +6,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
 import { Plus } from "lucide-react";
+import { useEquipment } from "@/hooks/useEquipment";
 
 const AddEquipment = () => {
-  const { toast } = useToast();
+  const { addEquipment, isAdding } = useEquipment();
   const [formData, setFormData] = useState({
-    itemName: "",
+    item_name: "",
     category: "",
     brand: "",
-    serialNumber: "",
-    purchaseDate: "",
+    serial_number: "",
+    purchase_date: "",
     supplier: "",
     price: "",
-    warrantyPeriod: "",
-    warrantyExpiry: "",
+    warranty_period: "",
+    warranty_expiry: "",
     location: "",
-    assignedTo: "",
+    assigned_to: "",
     condition: "",
     notes: ""
   });
@@ -49,20 +49,30 @@ const AddEquipment = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Here you would typically save to Supabase
-    console.log("Equipment data:", formData);
-    console.log("Attachments:", attachments);
-    
-    toast({
-      title: "Equipment Added",
-      description: `${formData.itemName} has been successfully registered.`,
-    });
+    // Prepare data for submission
+    const equipmentData = {
+      item_name: formData.item_name,
+      category: formData.category,
+      brand: formData.brand,
+      serial_number: formData.serial_number,
+      purchase_date: formData.purchase_date || null,
+      supplier: formData.supplier || null,
+      price: formData.price ? parseFloat(formData.price) : null,
+      warranty_period: formData.warranty_period || null,
+      warranty_expiry: formData.warranty_expiry || null,
+      location: formData.location || null,
+      assigned_to: formData.assigned_to || null,
+      condition: formData.condition,
+      notes: formData.notes || null,
+    };
 
-    // Reset form
+    addEquipment(equipmentData);
+
+    // Reset form on success
     setFormData({
-      itemName: "", category: "", brand: "", serialNumber: "", purchaseDate: "",
-      supplier: "", price: "", warrantyPeriod: "", warrantyExpiry: "",
-      location: "", assignedTo: "", condition: "", notes: ""
+      item_name: "", category: "", brand: "", serial_number: "", purchase_date: "",
+      supplier: "", price: "", warranty_period: "", warranty_expiry: "",
+      location: "", assigned_to: "", condition: "", notes: ""
     });
     setAttachments([]);
   };
@@ -86,11 +96,11 @@ const AddEquipment = () => {
               <h3 className="text-lg font-semibold text-slate-800">Basic Information</h3>
               
               <div>
-                <Label htmlFor="itemName">Item Name *</Label>
+                <Label htmlFor="item_name">Item Name *</Label>
                 <Input
-                  id="itemName"
-                  value={formData.itemName}
-                  onChange={(e) => handleInputChange("itemName", e.target.value)}
+                  id="item_name"
+                  value={formData.item_name}
+                  onChange={(e) => handleInputChange("item_name", e.target.value)}
                   placeholder="e.g., Dell Laptop XPS 13"
                   required
                 />
@@ -122,11 +132,11 @@ const AddEquipment = () => {
               </div>
 
               <div>
-                <Label htmlFor="serialNumber">Serial Number *</Label>
+                <Label htmlFor="serial_number">Serial Number *</Label>
                 <Input
-                  id="serialNumber"
-                  value={formData.serialNumber}
-                  onChange={(e) => handleInputChange("serialNumber", e.target.value)}
+                  id="serial_number"
+                  value={formData.serial_number}
+                  onChange={(e) => handleInputChange("serial_number", e.target.value)}
                   placeholder="Unique serial number"
                   required
                 />
@@ -152,12 +162,12 @@ const AddEquipment = () => {
               <h3 className="text-lg font-semibold text-slate-800">Purchase & Warranty</h3>
               
               <div>
-                <Label htmlFor="purchaseDate">Purchase Date</Label>
+                <Label htmlFor="purchase_date">Purchase Date</Label>
                 <Input
-                  id="purchaseDate"
+                  id="purchase_date"
                   type="date"
-                  value={formData.purchaseDate}
-                  onChange={(e) => handleInputChange("purchaseDate", e.target.value)}
+                  value={formData.purchase_date}
+                  onChange={(e) => handleInputChange("purchase_date", e.target.value)}
                 />
               </div>
 
@@ -184,22 +194,22 @@ const AddEquipment = () => {
               </div>
 
               <div>
-                <Label htmlFor="warrantyPeriod">Warranty Period</Label>
+                <Label htmlFor="warranty_period">Warranty Period</Label>
                 <Input
-                  id="warrantyPeriod"
-                  value={formData.warrantyPeriod}
-                  onChange={(e) => handleInputChange("warrantyPeriod", e.target.value)}
+                  id="warranty_period"
+                  value={formData.warranty_period}
+                  onChange={(e) => handleInputChange("warranty_period", e.target.value)}
                   placeholder="e.g., 3 years, 12 months"
                 />
               </div>
 
               <div>
-                <Label htmlFor="warrantyExpiry">Warranty Expiry Date</Label>
+                <Label htmlFor="warranty_expiry">Warranty Expiry Date</Label>
                 <Input
-                  id="warrantyExpiry"
+                  id="warranty_expiry"
                   type="date"
-                  value={formData.warrantyExpiry}
-                  onChange={(e) => handleInputChange("warrantyExpiry", e.target.value)}
+                  value={formData.warranty_expiry}
+                  onChange={(e) => handleInputChange("warranty_expiry", e.target.value)}
                 />
               </div>
             </div>
@@ -218,11 +228,11 @@ const AddEquipment = () => {
             </div>
 
             <div>
-              <Label htmlFor="assignedTo">Assigned To</Label>
+              <Label htmlFor="assigned_to">Assigned To</Label>
               <Input
-                id="assignedTo"
-                value={formData.assignedTo}
-                onChange={(e) => handleInputChange("assignedTo", e.target.value)}
+                id="assigned_to"
+                value={formData.assigned_to}
+                onChange={(e) => handleInputChange("assigned_to", e.target.value)}
                 placeholder="e.g., John Smith"
               />
             </div>
@@ -256,9 +266,9 @@ const AddEquipment = () => {
             </div>
           </div>
 
-          <Button type="submit" className="w-full md:w-auto">
+          <Button type="submit" className="w-full md:w-auto" disabled={isAdding}>
             <Plus className="h-4 w-4 mr-2" />
-            Add Equipment
+            {isAdding ? "Adding Equipment..." : "Add Equipment"}
           </Button>
         </form>
       </CardContent>

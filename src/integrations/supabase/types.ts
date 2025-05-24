@@ -9,7 +9,148 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      equipment: {
+        Row: {
+          assigned_to: string | null
+          brand: string
+          category: string
+          condition: string
+          created_at: string
+          id: string
+          item_name: string
+          location: string | null
+          notes: string | null
+          price: number | null
+          purchase_date: string | null
+          serial_number: string
+          supplier: string | null
+          updated_at: string
+          user_id: string
+          warranty_expiry: string | null
+          warranty_period: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          brand: string
+          category: string
+          condition: string
+          created_at?: string
+          id?: string
+          item_name: string
+          location?: string | null
+          notes?: string | null
+          price?: number | null
+          purchase_date?: string | null
+          serial_number: string
+          supplier?: string | null
+          updated_at?: string
+          user_id: string
+          warranty_expiry?: string | null
+          warranty_period?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          brand?: string
+          category?: string
+          condition?: string
+          created_at?: string
+          id?: string
+          item_name?: string
+          location?: string | null
+          notes?: string | null
+          price?: number | null
+          purchase_date?: string | null
+          serial_number?: string
+          supplier?: string | null
+          updated_at?: string
+          user_id?: string
+          warranty_expiry?: string | null
+          warranty_period?: string | null
+        }
+        Relationships: []
+      }
+      equipment_attachments: {
+        Row: {
+          equipment_id: string
+          file_name: string
+          file_size: number | null
+          file_type: string
+          file_url: string
+          id: string
+          uploaded_at: string
+        }
+        Insert: {
+          equipment_id: string
+          file_name: string
+          file_size?: number | null
+          file_type: string
+          file_url: string
+          id?: string
+          uploaded_at?: string
+        }
+        Update: {
+          equipment_id?: string
+          file_name?: string
+          file_size?: number | null
+          file_type?: string
+          file_url?: string
+          id?: string
+          uploaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "equipment_attachments_equipment_id_fkey"
+            columns: ["equipment_id"]
+            isOneToOne: false
+            referencedRelation: "equipment"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      repairs: {
+        Row: {
+          bill_attachment_url: string | null
+          created_at: string
+          description: string
+          equipment_id: string
+          id: string
+          notes: string | null
+          repair_cost: number
+          repair_date: string
+          updated_at: string
+        }
+        Insert: {
+          bill_attachment_url?: string | null
+          created_at?: string
+          description: string
+          equipment_id: string
+          id?: string
+          notes?: string | null
+          repair_cost: number
+          repair_date: string
+          updated_at?: string
+        }
+        Update: {
+          bill_attachment_url?: string | null
+          created_at?: string
+          description?: string
+          equipment_id?: string
+          id?: string
+          notes?: string | null
+          repair_cost?: number
+          repair_date?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repairs_equipment_id_fkey"
+            columns: ["equipment_id"]
+            isOneToOne: false
+            referencedRelation: "equipment"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

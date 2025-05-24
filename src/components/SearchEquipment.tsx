@@ -7,75 +7,34 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Search, FileText, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useEquipmentBySerial } from "@/hooks/useEquipment";
+import { useRepairs } from "@/hooks/useRepairs";
 
 const SearchEquipment = () => {
   const { toast } = useToast();
   const [searchSerial, setSearchSerial] = useState("");
-  const [searchResults, setSearchResults] = useState<any>(null);
+  const [shouldSearch, setShouldSearch] = useState(false);
 
-  // Mock comprehensive equipment data
-  const mockEquipmentData = {
-    itemName: "Dell Laptop XPS 13",
-    category: "Computer",
-    brand: "Dell XPS 13",
-    serialNumber: "DL001234",
-    purchaseDate: "2023-01-15",
-    supplier: "Dell Direct",
-    price: 1299.99,
-    warrantyPeriod: "3 years",
-    warrantyExpiry: "2026-01-15",
-    location: "Office A - Desk 12",
-    assignedTo: "John Smith",
-    condition: "Good",
-    notes: "Primary work laptop for development team",
-    attachments: [
-      { name: "purchase-receipt.pdf", type: "Receipt", date: "2023-01-15" },
-      { name: "warranty-info.pdf", type: "Warranty", date: "2023-01-15" },
-      { name: "user-manual.pdf", type: "Manual", date: "2023-01-15" }
-    ],
-    repairHistory: [
-      {
-        id: 1,
-        date: "2023-11-15",
-        cost: 125.50,
-        description: "Screen replacement",
-        notes: "Cracked screen from accidental drop",
-        bill: "repair-bill-001.pdf"
-      },
-      {
-        id: 2,
-        date: "2023-08-20",
-        cost: 75.00,
-        description: "Battery replacement",
-        notes: "Battery not holding charge properly",
-        bill: "repair-bill-002.pdf"
-      },
-      {
-        id: 3,
-        date: "2023-05-10",
-        cost: 45.00,
-        description: "Keyboard cleaning",
-        notes: "Sticky keys after coffee spill",
-        bill: "repair-bill-003.pdf"
-      }
-    ]
-  };
+  const { data: searchResults, isLoading: isSearching } = useEquipmentBySerial(
+    shouldSearch ? searchSerial : ""
+  );
+  
+  const { repairs } = useRepairs(searchResults?.id);
 
   const handleSearch = () => {
-    if (searchSerial === "DL001234") {
-      setSearchResults(mockEquipmentData);
+    if (!searchSerial.trim()) {
       toast({
-        title: "Equipment Found",
-        description: `Found detailed information for ${mockEquipmentData.itemName}`,
-      });
-    } else {
-      setSearchResults(null);
-      toast({
-        title: "Equipment Not Found",
-        description: "No equipment found with that serial number",
+        title: "Search Error",
+        description: "Please enter a serial number",
         variant: "destructive"
       });
+      return;
     }
+
+    setShouldSearch(true);
+    
+    // Reset search flag after a delay to allow for new searches
+    setTimeout(() => setShouldSearch(false), 100);
   };
 
   const generatePDF = () => {
@@ -86,7 +45,7 @@ const SearchEquipment = () => {
     });
   };
 
-  const totalRepairCost = searchResults?.repairHistory.reduce((sum: number, repair: any) => sum + repair.cost, 0) || 0;
+  const totalRepairCost = repairs.reduce((sum, repair) => sum + repair.repair_cost, 0);
 
   return (
     <div className="space-y-6">
@@ -109,16 +68,22 @@ const SearchEquipment = () => {
                 id="searchSerial"
                 value={searchSerial}
                 onChange={(e) => setSearchSerial(e.target.value)}
-                placeholder="Enter serial number (try: DL001234)"
+                placeholder="Enter serial number"
               />
             </div>
             <div className="flex items-end">
-              <Button onClick={handleSearch}>
+              <Button onClick={handleSearch} disabled={isSearching}>
                 <Search className="h-4 w-4 mr-2" />
-                Search
+                {isSearching ? "Searching..." : "Search"}
               </Button>
             </div>
           </div>
+          
+          {shouldSearch && !searchResults && !isSearching && (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-800">No equipment found with serial number: {searchSerial}</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -130,9 +95,9 @@ const SearchEquipment = () => {
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
-                  <CardTitle>{searchResults.itemName}</CardTitle>
+                  <CardTitle>{searchResults.item_name}</CardTitle>
                   <CardDescription>
-                    Serial Number: {searchResults.serialNumber} | Category: {searchResults.category}
+                    Serial Number: {searchResults.serial_number} | Category: {searchResults.category}
                   </CardDescription>
                 </div>
                 <Button onClick={generatePDF} className="flex items-center gap-2">
@@ -157,11 +122,11 @@ const SearchEquipment = () => {
                     </div>
                     <div>
                       <p className="text-sm text-slate-500">Location</p>
-                      <p className="font-medium">{searchResults.location}</p>
+                      <p className="font-medium">{searchResults.location || "Not specified"}</p>
                     </div>
                     <div>
                       <p className="text-sm text-slate-500">Assigned To</p>
-                      <p className="font-medium">{searchResults.assignedTo}</p>
+                      <p className="font-medium">{searchResults.assigned_to || "Unassigned"}</p>
                     </div>
                   </div>
                 </div>
@@ -172,19 +137,26 @@ const SearchEquipment = () => {
                   <div className="space-y-2">
                     <div>
                       <p className="text-sm text-slate-500">Purchase Date</p>
-                      <p className="font-medium">{new Date(searchResults.purchaseDate).toLocaleDateString()}</p>
+                      <p className="font-medium">
+                        {searchResults.purchase_date 
+                          ? new Date(searchResults.purchase_date).toLocaleDateString()
+                          : "Not specified"
+                        }
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-slate-500">Supplier</p>
-                      <p className="font-medium">{searchResults.supplier}</p>
+                      <p className="font-medium">{searchResults.supplier || "Not specified"}</p>
                     </div>
                     <div>
                       <p className="text-sm text-slate-500">Price</p>
-                      <p className="font-medium">${searchResults.price.toLocaleString()}</p>
+                      <p className="font-medium">
+                        {searchResults.price ? `$${searchResults.price.toLocaleString()}` : "Not specified"}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-slate-500">Warranty Period</p>
-                      <p className="font-medium">{searchResults.warrantyPeriod}</p>
+                      <p className="font-medium">{searchResults.warranty_period || "Not specified"}</p>
                     </div>
                   </div>
                 </div>
@@ -195,7 +167,9 @@ const SearchEquipment = () => {
                   <div className="space-y-2">
                     <div>
                       <p className="text-sm text-slate-500">Initial Cost</p>
-                      <p className="font-medium">${searchResults.price.toLocaleString()}</p>
+                      <p className="font-medium">
+                        {searchResults.price ? `$${searchResults.price.toLocaleString()}` : "Not specified"}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-slate-500">Total Repair Cost</p>
@@ -203,12 +177,21 @@ const SearchEquipment = () => {
                     </div>
                     <div>
                       <p className="text-sm text-slate-500">Total Investment</p>
-                      <p className="font-medium text-slate-800">${(searchResults.price + totalRepairCost).toFixed(2)}</p>
+                      <p className="font-medium text-slate-800">
+                        ${((searchResults.price || 0) + totalRepairCost).toFixed(2)}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-slate-500">Warranty Status</p>
-                      <Badge className={new Date(searchResults.warrantyExpiry) > new Date() ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
-                        {new Date(searchResults.warrantyExpiry) > new Date() ? "Active" : "Expired"}
+                      <Badge className={
+                        searchResults.warranty_expiry && new Date(searchResults.warranty_expiry) > new Date() 
+                          ? "bg-green-100 text-green-800" 
+                          : "bg-red-100 text-red-800"
+                      }>
+                        {searchResults.warranty_expiry && new Date(searchResults.warranty_expiry) > new Date() 
+                          ? "Active" 
+                          : "Expired"
+                        }
                       </Badge>
                     </div>
                   </div>
@@ -225,37 +208,6 @@ const SearchEquipment = () => {
             </CardContent>
           </Card>
 
-          {/* Document Attachments */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Document Attachments
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {searchResults.attachments.map((doc: any, index: number) => (
-                  <Card key={index} className="border border-slate-200">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <FileText className="h-8 w-8 text-blue-500" />
-                        <div className="flex-1">
-                          <p className="font-medium text-sm">{doc.name}</p>
-                          <p className="text-xs text-slate-500">{doc.type}</p>
-                          <p className="text-xs text-slate-500">{new Date(doc.date).toLocaleDateString()}</p>
-                        </div>
-                      </div>
-                      <Button variant="outline" size="sm" className="w-full mt-3">
-                        Download
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Repair History */}
           <Card>
             <CardHeader>
@@ -268,55 +220,65 @@ const SearchEquipment = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {searchResults.repairHistory.map((repair: any) => (
-                  <Card key={repair.id} className="border-l-4 border-l-orange-400">
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="flex-1">
-                          <h4 className="font-medium text-slate-800">{repair.description}</h4>
-                          <p className="text-sm text-slate-600 mt-1">{repair.notes}</p>
-                          <p className="text-sm text-slate-500 mt-2">
-                            Date: {new Date(repair.date).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-semibold text-lg">${repair.cost.toFixed(2)}</p>
-                          <Badge variant="outline" className="mt-1">
-                            Repair #{repair.id}
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
-                          <FileText className="h-4 w-4 mr-2" />
-                          View Bill
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-              
-              {/* Summary */}
-              <div className="mt-6 pt-6 border-t bg-slate-50 rounded-lg p-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                  <div>
-                    <p className="text-2xl font-bold text-slate-800">{searchResults.repairHistory.length}</p>
-                    <p className="text-sm text-slate-600">Total Repairs</p>
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-orange-600">${totalRepairCost.toFixed(2)}</p>
-                    <p className="text-sm text-slate-600">Total Repair Cost</p>
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-slate-800">
-                      ${(totalRepairCost / searchResults.repairHistory.length).toFixed(2)}
-                    </p>
-                    <p className="text-sm text-slate-600">Average Repair Cost</p>
-                  </div>
+              {repairs.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-slate-600">No repair history available.</p>
                 </div>
-              </div>
+              ) : (
+                <>
+                  <div className="space-y-4">
+                    {repairs.map((repair) => (
+                      <Card key={repair.id} className="border-l-4 border-l-orange-400">
+                        <CardContent className="p-4">
+                          <div className="flex justify-between items-start mb-3">
+                            <div className="flex-1">
+                              <h4 className="font-medium text-slate-800">{repair.description}</h4>
+                              <p className="text-sm text-slate-600 mt-1">{repair.notes}</p>
+                              <p className="text-sm text-slate-500 mt-2">
+                                Date: {new Date(repair.repair_date).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-semibold text-lg">${repair.repair_cost.toFixed(2)}</p>
+                              <Badge variant="outline" className="mt-1">
+                                Repair #{repair.id.slice(0, 8)}
+                              </Badge>
+                            </div>
+                          </div>
+                          {repair.bill_attachment_url && (
+                            <div className="flex gap-2">
+                              <Button variant="outline" size="sm">
+                                <FileText className="h-4 w-4 mr-2" />
+                                View Bill
+                              </Button>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                  
+                  {/* Summary */}
+                  <div className="mt-6 pt-6 border-t bg-slate-50 rounded-lg p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                      <div>
+                        <p className="text-2xl font-bold text-slate-800">{repairs.length}</p>
+                        <p className="text-sm text-slate-600">Total Repairs</p>
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-orange-600">${totalRepairCost.toFixed(2)}</p>
+                        <p className="text-sm text-slate-600">Total Repair Cost</p>
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-slate-800">
+                          {repairs.length > 0 ? `$${(totalRepairCost / repairs.length).toFixed(2)}` : "$0.00"}
+                        </p>
+                        <p className="text-sm text-slate-600">Average Repair Cost</p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>

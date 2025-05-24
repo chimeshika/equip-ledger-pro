@@ -8,80 +8,70 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Search, FileText, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useEquipmentBySerial } from "@/hooks/useEquipment";
+import { useRepairs } from "@/hooks/useRepairs";
 
 const RepairDetails = () => {
   const { toast } = useToast();
   const [searchSerial, setSearchSerial] = useState("");
-  const [selectedEquipment, setSelectedEquipment] = useState<any>(null);
+  const [shouldSearch, setShouldSearch] = useState(false);
   const [repairData, setRepairData] = useState({
-    repairDate: "",
-    repairCost: "",
+    repair_date: "",
+    repair_cost: "",
     description: "",
     notes: ""
   });
   const [repairBill, setRepairBill] = useState<File | null>(null);
 
-  // Mock equipment data (in real app, this would come from Supabase)
-  const mockEquipment = {
-    itemName: "Dell Laptop XPS 13",
-    serialNumber: "DL001234",
-    brand: "Dell",
-    category: "Computer",
-    assignedTo: "John Smith",
-    condition: "Good",
-    repairHistory: [
-      {
-        id: 1,
-        date: "2023-11-15",
-        cost: 125.50,
-        description: "Screen replacement",
-        notes: "Cracked screen from drop",
-        bill: "repair-bill-001.pdf"
-      },
-      {
-        id: 2,
-        date: "2023-08-20",
-        cost: 75.00,
-        description: "Battery replacement",
-        notes: "Battery not holding charge",
-        bill: "repair-bill-002.pdf"
-      }
-    ]
-  };
+  const { data: selectedEquipment, isLoading: isSearching } = useEquipmentBySerial(
+    shouldSearch ? searchSerial : ""
+  );
+  
+  const { repairs, addRepair, isAdding } = useRepairs(selectedEquipment?.id);
 
   const handleSearch = () => {
-    if (searchSerial === "DL001234") {
-      setSelectedEquipment(mockEquipment);
+    if (!searchSerial.trim()) {
       toast({
-        title: "Equipment Found",
-        description: `Found ${mockEquipment.itemName} with serial number ${searchSerial}`,
-      });
-    } else {
-      setSelectedEquipment(null);
-      toast({
-        title: "Equipment Not Found",
-        description: "No equipment found with that serial number",
+        title: "Search Error",
+        description: "Please enter a serial number",
         variant: "destructive"
       });
+      return;
     }
+
+    setShouldSearch(true);
+    
+    // Reset search flag after a delay to allow for new searches
+    setTimeout(() => setShouldSearch(false), 100);
   };
 
   const handleRepairSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Here you would save repair data to Supabase
-    console.log("Repair data:", repairData);
-    console.log("Repair bill:", repairBill);
-    
-    toast({
-      title: "Repair Record Added",
-      description: "Repair details have been successfully saved.",
-    });
+    if (!selectedEquipment) {
+      toast({
+        title: "Error",
+        description: "No equipment selected for repair",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const repairRecord = {
+      equipment_id: selectedEquipment.id,
+      repair_date: repairData.repair_date,
+      repair_cost: parseFloat(repairData.repair_cost),
+      description: repairData.description,
+      notes: repairData.notes || null,
+      bill_attachment_url: null, // TODO: Implement file upload
+    };
+
+    addRepair(repairRecord);
 
     // Reset form
     setRepairData({
-      repairDate: "",
-      repairCost: "",
+      repair_date: "",
+      repair_cost: "",
       description: "",
       notes: ""
     });
@@ -115,16 +105,22 @@ const RepairDetails = () => {
                 id="searchSerial"
                 value={searchSerial}
                 onChange={(e) => setSearchSerial(e.target.value)}
-                placeholder="Enter serial number (try: DL001234)"
+                placeholder="Enter serial number"
               />
             </div>
             <div className="flex items-end">
-              <Button onClick={handleSearch}>
+              <Button onClick={handleSearch} disabled={isSearching}>
                 <Search className="h-4 w-4 mr-2" />
-                Search
+                {isSearching ? "Searching..." : "Search"}
               </Button>
             </div>
           </div>
+          
+          {shouldSearch && !selectedEquipment && !isSearching && (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-800">No equipment found with serial number: {searchSerial}</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -138,7 +134,7 @@ const RepairDetails = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div>
                 <p className="text-sm text-slate-500">Item Name</p>
-                <p className="font-medium">{selectedEquipment.itemName}</p>
+                <p className="font-medium">{selectedEquipment.item_name}</p>
               </div>
               <div>
                 <p className="text-sm text-slate-500">Brand</p>
@@ -150,7 +146,7 @@ const RepairDetails = () => {
               </div>
               <div>
                 <p className="text-sm text-slate-500">Assigned To</p>
-                <p className="font-medium">{selectedEquipment.assignedTo}</p>
+                <p className="font-medium">{selectedEquipment.assigned_to || "Unassigned"}</p>
               </div>
               <div>
                 <p className="text-sm text-slate-500">Condition</p>
@@ -158,7 +154,7 @@ const RepairDetails = () => {
               </div>
               <div>
                 <p className="text-sm text-slate-500">Serial Number</p>
-                <p className="font-medium">{selectedEquipment.serialNumber}</p>
+                <p className="font-medium">{selectedEquipment.serial_number}</p>
               </div>
             </div>
 
@@ -166,26 +162,32 @@ const RepairDetails = () => {
             <div className="mb-6">
               <h3 className="text-lg font-semibold mb-3">Repair History</h3>
               <div className="space-y-3">
-                {selectedEquipment.repairHistory.map((repair: any) => (
-                  <Card key={repair.id} className="border-l-4 border-l-orange-400">
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <p className="font-medium">{repair.description}</p>
-                          <p className="text-sm text-slate-600">{repair.notes}</p>
+                {repairs.length === 0 ? (
+                  <p className="text-slate-500">No repair history available.</p>
+                ) : (
+                  repairs.map((repair) => (
+                    <Card key={repair.id} className="border-l-4 border-l-orange-400">
+                      <CardContent className="p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <p className="font-medium">{repair.description}</p>
+                            <p className="text-sm text-slate-600">{repair.notes}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-medium">${repair.repair_cost}</p>
+                            <p className="text-sm text-slate-500">{new Date(repair.repair_date).toLocaleDateString()}</p>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-medium">${repair.cost}</p>
-                          <p className="text-sm text-slate-500">{new Date(repair.date).toLocaleDateString()}</p>
-                        </div>
-                      </div>
-                      <Button variant="outline" size="sm">
-                        <FileText className="h-4 w-4 mr-2" />
-                        View Bill
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
+                        {repair.bill_attachment_url && (
+                          <Button variant="outline" size="sm">
+                            <FileText className="h-4 w-4 mr-2" />
+                            View Bill
+                          </Button>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
               </div>
             </div>
           </CardContent>
@@ -205,24 +207,24 @@ const RepairDetails = () => {
             <form onSubmit={handleRepairSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="repairDate">Repair Date *</Label>
+                  <Label htmlFor="repair_date">Repair Date *</Label>
                   <Input
-                    id="repairDate"
+                    id="repair_date"
                     type="date"
-                    value={repairData.repairDate}
-                    onChange={(e) => setRepairData(prev => ({ ...prev, repairDate: e.target.value }))}
+                    value={repairData.repair_date}
+                    onChange={(e) => setRepairData(prev => ({ ...prev, repair_date: e.target.value }))}
                     required
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="repairCost">Repair Cost ($) *</Label>
+                  <Label htmlFor="repair_cost">Repair Cost ($) *</Label>
                   <Input
-                    id="repairCost"
+                    id="repair_cost"
                     type="number"
                     step="0.01"
-                    value={repairData.repairCost}
-                    onChange={(e) => setRepairData(prev => ({ ...prev, repairCost: e.target.value }))}
+                    value={repairData.repair_cost}
+                    onChange={(e) => setRepairData(prev => ({ ...prev, repair_cost: e.target.value }))}
                     placeholder="0.00"
                     required
                   />
@@ -264,9 +266,9 @@ const RepairDetails = () => {
                 </p>
               </div>
 
-              <Button type="submit">
+              <Button type="submit" disabled={isAdding}>
                 <Plus className="h-4 w-4 mr-2" />
-                Add Repair Record
+                {isAdding ? "Adding Repair..." : "Add Repair Record"}
               </Button>
             </form>
           </CardContent>

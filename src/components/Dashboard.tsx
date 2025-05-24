@@ -2,64 +2,26 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import EquipmentCard from "./EquipmentCard";
-
-// Mock data for demonstration
-const mockEquipments = [
-  {
-    id: "1",
-    itemName: "Dell Laptop XPS 13",
-    category: "Computer",
-    brand: "Dell",
-    serialNumber: "DL001234",
-    purchaseDate: "2023-01-15",
-    supplier: "Dell Direct",
-    price: 1299.99,
-    warrantyPeriod: "3 years",
-    warrantyExpiry: "2026-01-15",
-    location: "Office A - Desk 12",
-    assignedTo: "John Smith",
-    condition: "Excellent",
-    notes: "Primary work laptop"
-  },
-  {
-    id: "2",
-    itemName: "iPhone 14 Pro",
-    category: "Mobile Device",
-    brand: "Apple",
-    serialNumber: "APL567890",
-    purchaseDate: "2023-03-10",
-    supplier: "Apple Store",
-    price: 999.99,
-    warrantyPeriod: "1 year",
-    warrantyExpiry: "2024-03-10",
-    location: "Mobile Pool",
-    assignedTo: "Sarah Johnson",
-    condition: "Good",
-    notes: "Company phone for sales team"
-  },
-  {
-    id: "3",
-    itemName: "HP Printer LaserJet",
-    category: "Printer",
-    brand: "HP",
-    serialNumber: "HP123456",
-    purchaseDate: "2022-11-20",
-    supplier: "Office Depot",
-    price: 299.99,
-    warrantyPeriod: "2 years",
-    warrantyExpiry: "2024-11-20",
-    location: "Reception Area",
-    assignedTo: "Office Manager",
-    condition: "Fair",
-    notes: "Main office printer, requires maintenance"
-  }
-];
+import { useEquipment } from "@/hooks/useEquipment";
 
 const Dashboard = () => {
-  const totalEquipment = mockEquipments.length;
-  const activeEquipment = mockEquipments.filter(eq => eq.condition !== "Out of Service").length;
-  const warningEquipment = mockEquipments.filter(eq => {
-    const expiryDate = new Date(eq.warrantyExpiry);
+  const { equipment, isLoading } = useEquipment();
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-8">
+          <p className="text-slate-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const totalEquipment = equipment.length;
+  const activeEquipment = equipment.filter(eq => eq.condition !== "Out of Service").length;
+  const warningEquipment = equipment.filter(eq => {
+    if (!eq.warranty_expiry) return false;
+    const expiryDate = new Date(eq.warranty_expiry);
     const now = new Date();
     const monthsUntilExpiry = (expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24 * 30);
     return monthsUntilExpiry <= 6 && monthsUntilExpiry > 0;
@@ -107,11 +69,18 @@ const Dashboard = () => {
           <CardDescription>Latest registered equipment in your inventory</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {mockEquipments.map((equipment) => (
-              <EquipmentCard key={equipment.id} equipment={equipment} />
-            ))}
-          </div>
+          {equipment.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-slate-600">No equipment registered yet.</p>
+              <p className="text-sm text-slate-500 mt-1">Add your first equipment to get started!</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {equipment.slice(0, 5).map((item) => (
+                <EquipmentCard key={item.id} equipment={item} />
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
