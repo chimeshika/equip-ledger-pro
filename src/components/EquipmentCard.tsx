@@ -3,23 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FileText } from "lucide-react";
-
-interface Equipment {
-  id: string;
-  itemName: string;
-  category: string;
-  brand: string;
-  serialNumber: string;
-  purchaseDate: string;
-  supplier: string;
-  price: number;
-  warrantyPeriod: string;
-  warrantyExpiry: string;
-  location: string;
-  assignedTo: string;
-  condition: string;
-  notes: string;
-}
+import { Equipment } from "@/hooks/useEquipment";
 
 interface EquipmentCardProps {
   equipment: Equipment;
@@ -38,7 +22,8 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
   };
 
   const isWarrantyExpiring = () => {
-    const expiryDate = new Date(equipment.warrantyExpiry);
+    if (!equipment.warranty_expiry) return false;
+    const expiryDate = new Date(equipment.warranty_expiry);
     const now = new Date();
     const monthsUntilExpiry = (expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24 * 30);
     return monthsUntilExpiry <= 6 && monthsUntilExpiry > 0;
@@ -49,8 +34,8 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-3">
           <div>
-            <h3 className="font-semibold text-lg text-slate-800">{equipment.itemName}</h3>
-            <p className="text-slate-600">{equipment.brand} • SN: {equipment.serialNumber}</p>
+            <h3 className="font-semibold text-lg text-slate-800">{equipment.item_name}</h3>
+            <p className="text-slate-600">{equipment.brand} • SN: {equipment.serial_number}</p>
           </div>
           <div className="flex gap-2">
             <Badge className={getConditionColor(equipment.condition)}>
@@ -69,21 +54,24 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
           </div>
           <div>
             <p className="text-slate-500">Location</p>
-            <p className="font-medium">{equipment.location}</p>
+            <p className="font-medium">{equipment.location || "Not specified"}</p>
           </div>
           <div>
             <p className="text-slate-500">Assigned To</p>
-            <p className="font-medium">{equipment.assignedTo}</p>
+            <p className="font-medium">{equipment.assigned_to || "Unassigned"}</p>
           </div>
           <div>
             <p className="text-slate-500">Price</p>
-            <p className="font-medium">${equipment.price.toLocaleString()}</p>
+            <p className="font-medium">{equipment.price ? `$${equipment.price.toLocaleString()}` : "Not specified"}</p>
           </div>
         </div>
         
         <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between items-center">
           <div className="text-sm text-slate-600">
-            Warranty expires: {new Date(equipment.warrantyExpiry).toLocaleDateString()}
+            {equipment.warranty_expiry 
+              ? `Warranty expires: ${new Date(equipment.warranty_expiry).toLocaleDateString()}`
+              : "No warranty information"
+            }
           </div>
           <Button variant="outline" size="sm">
             <FileText className="h-4 w-4 mr-2" />
