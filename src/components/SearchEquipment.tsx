@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,12 +12,9 @@ import { useRepairs } from "@/hooks/useRepairs";
 const SearchEquipment = () => {
   const { toast } = useToast();
   const [searchSerial, setSearchSerial] = useState("");
-  const [shouldSearch, setShouldSearch] = useState(false);
+  const [activeSearchSerial, setActiveSearchSerial] = useState("");
 
-  const { data: searchResults, isLoading: isSearching } = useEquipmentBySerial(
-    shouldSearch ? searchSerial : ""
-  );
-  
+  const { data: searchResults, isLoading: isSearching } = useEquipmentBySerial(activeSearchSerial);
   const { repairs } = useRepairs(searchResults?.id);
 
   const handleSearch = () => {
@@ -31,10 +27,7 @@ const SearchEquipment = () => {
       return;
     }
 
-    setShouldSearch(true);
-    
-    // Reset search flag after a delay to allow for new searches
-    setTimeout(() => setShouldSearch(false), 100);
+    setActiveSearchSerial(searchSerial.trim());
   };
 
   const generatePDF = () => {
@@ -69,6 +62,7 @@ const SearchEquipment = () => {
                 value={searchSerial}
                 onChange={(e) => setSearchSerial(e.target.value)}
                 placeholder="Enter serial number"
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
               />
             </div>
             <div className="flex items-end">
@@ -79,9 +73,9 @@ const SearchEquipment = () => {
             </div>
           </div>
           
-          {shouldSearch && !searchResults && !isSearching && (
+          {activeSearchSerial && !searchResults && !isSearching && (
             <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-800">No equipment found with serial number: {searchSerial}</p>
+              <p className="text-red-800">No equipment found with serial number: {activeSearchSerial}</p>
             </div>
           )}
         </CardContent>

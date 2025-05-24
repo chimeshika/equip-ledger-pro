@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,7 @@ import { useRepairs } from "@/hooks/useRepairs";
 const RepairDetails = () => {
   const { toast } = useToast();
   const [searchSerial, setSearchSerial] = useState("");
-  const [shouldSearch, setShouldSearch] = useState(false);
+  const [activeSearchSerial, setActiveSearchSerial] = useState("");
   const [repairData, setRepairData] = useState({
     repair_date: "",
     repair_cost: "",
@@ -23,10 +22,7 @@ const RepairDetails = () => {
   });
   const [repairBill, setRepairBill] = useState<File | null>(null);
 
-  const { data: selectedEquipment, isLoading: isSearching } = useEquipmentBySerial(
-    shouldSearch ? searchSerial : ""
-  );
-  
+  const { data: selectedEquipment, isLoading: isSearching } = useEquipmentBySerial(activeSearchSerial);
   const { repairs, addRepair, isAdding } = useRepairs(selectedEquipment?.id);
 
   const handleSearch = () => {
@@ -39,10 +35,7 @@ const RepairDetails = () => {
       return;
     }
 
-    setShouldSearch(true);
-    
-    // Reset search flag after a delay to allow for new searches
-    setTimeout(() => setShouldSearch(false), 100);
+    setActiveSearchSerial(searchSerial.trim());
   };
 
   const handleRepairSubmit = (e: React.FormEvent) => {
@@ -106,6 +99,7 @@ const RepairDetails = () => {
                 value={searchSerial}
                 onChange={(e) => setSearchSerial(e.target.value)}
                 placeholder="Enter serial number"
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
               />
             </div>
             <div className="flex items-end">
@@ -116,9 +110,9 @@ const RepairDetails = () => {
             </div>
           </div>
           
-          {shouldSearch && !selectedEquipment && !isSearching && (
+          {activeSearchSerial && !selectedEquipment && !isSearching && (
             <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-800">No equipment found with serial number: {searchSerial}</p>
+              <p className="text-red-800">No equipment found with serial number: {activeSearchSerial}</p>
             </div>
           )}
         </CardContent>
