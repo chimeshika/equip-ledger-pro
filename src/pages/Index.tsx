@@ -2,20 +2,35 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import Dashboard from "@/components/Dashboard";
 import AddEquipment from "@/components/AddEquipment";
 import RepairDetails from "@/components/RepairDetails";
 import SearchEquipment from "@/components/SearchEquipment";
-import { Settings, FileText, Search, Plus } from "lucide-react";
+import { Settings, FileText, Search, Plus, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
+  const { signOut, user } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <div className="container mx-auto p-6">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-800 mb-2">Equipment Recorder</h1>
-          <p className="text-slate-600">Manage your equipment inventory, repairs, and documentation</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-bold text-slate-800 mb-2">Equipment Recorder</h1>
+            <p className="text-slate-600">Manage your equipment inventory, repairs, and documentation</p>
+            {user && <p className="text-sm text-slate-500 mt-1">Welcome, {user.email}</p>}
+          </div>
+          <Button variant="outline" onClick={handleSignOut} className="flex items-center gap-2">
+            <LogOut className="h-4 w-4" />
+            Sign Out
+          </Button>
         </div>
 
         {/* Main Tabs */}
