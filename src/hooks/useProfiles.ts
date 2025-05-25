@@ -8,6 +8,7 @@ export interface Profile {
   id: string;
   email: string;
   full_name?: string;
+  phone?: string;
   role: 'admin' | 'user';
   created_at: string;
   updated_at: string;
