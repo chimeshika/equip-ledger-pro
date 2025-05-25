@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { Search, FileText, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useEquipmentBySerial } from "@/hooks/useEquipment";
 import { useRepairs } from "@/hooks/useRepairs";
+import { useProfiles } from "@/hooks/useProfiles";
 
 const RepairDetails = () => {
   const { toast } = useToast();
@@ -24,6 +26,10 @@ const RepairDetails = () => {
 
   const { data: selectedEquipment, isLoading: isSearching } = useEquipmentBySerial(activeSearchSerial);
   const { repairs, addRepair, isAdding } = useRepairs(selectedEquipment?.id);
+  const { profiles } = useProfiles();
+
+  // Find the creator of the equipment
+  const equipmentCreator = profiles.find(profile => profile.id === selectedEquipment?.created_by);
 
   const handleSearch = () => {
     if (!searchSerial.trim()) {
@@ -123,6 +129,11 @@ const RepairDetails = () => {
         <Card>
           <CardHeader>
             <CardTitle>Equipment Details</CardTitle>
+            {equipmentCreator && (
+              <CardDescription>
+                Added by: {equipmentCreator.full_name || equipmentCreator.email}
+              </CardDescription>
+            )}
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

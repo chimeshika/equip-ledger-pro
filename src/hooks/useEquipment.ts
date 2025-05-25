@@ -19,6 +19,7 @@ export interface Equipment {
   assigned_to?: string;
   condition: string;
   notes?: string;
+  created_by?: string;
   created_at: string;
   updated_at: string;
 }
@@ -49,12 +50,12 @@ export const useEquipment = () => {
   });
 
   const addEquipmentMutation = useMutation({
-    mutationFn: async (equipmentData: Omit<Equipment, 'id' | 'created_at' | 'updated_at'>) => {
+    mutationFn: async (equipmentData: Omit<Equipment, 'id' | 'created_at' | 'updated_at' | 'created_by'>) => {
       if (!user) throw new Error('User not authenticated');
 
       const { data, error } = await supabase
         .from('equipment')
-        .insert([{ ...equipmentData, user_id: user.id }])
+        .insert([{ ...equipmentData, created_by: user.id }])
         .select()
         .single();
 

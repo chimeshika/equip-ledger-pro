@@ -7,15 +7,21 @@ import Dashboard from "@/components/Dashboard";
 import AddEquipment from "@/components/AddEquipment";
 import RepairDetails from "@/components/RepairDetails";
 import SearchEquipment from "@/components/SearchEquipment";
-import { Settings, FileText, Search, Plus, LogOut } from "lucide-react";
+import AdminPortal from "@/components/AdminPortal";
+import UserProfile from "@/components/UserProfile";
+import { Settings, FileText, Search, Plus, LogOut, Shield, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCurrentUser } from "@/hooks/useProfiles";
 
 const Index = () => {
   const { signOut, user } = useAuth();
+  const { data: currentUser } = useCurrentUser();
 
   const handleSignOut = async () => {
     await signOut();
   };
+
+  const isAdmin = currentUser?.role === 'admin';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -25,7 +31,16 @@ const Index = () => {
           <div>
             <h1 className="text-4xl font-bold text-slate-800 mb-2">Equipment Recorder</h1>
             <p className="text-slate-600">Manage your equipment inventory, repairs, and documentation</p>
-            {user && <p className="text-sm text-slate-500 mt-1">Welcome, {user.email}</p>}
+            {user && (
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-sm text-slate-500">Welcome, {user.email}</p>
+                {currentUser && (
+                  <span className="text-xs bg-slate-200 px-2 py-1 rounded">
+                    {currentUser.role === 'admin' ? 'Administrator' : 'User'}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
           <Button variant="outline" onClick={handleSignOut} className="flex items-center gap-2">
             <LogOut className="h-4 w-4" />
@@ -35,7 +50,7 @@ const Index = () => {
 
         {/* Main Tabs */}
         <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6">
+          <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-6' : 'grid-cols-5'} mb-6`}>
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
               Dashboard
@@ -52,6 +67,16 @@ const Index = () => {
               <Search className="h-4 w-4" />
               Search
             </TabsTrigger>
+            <TabsTrigger value="profile" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Profile
+            </TabsTrigger>
+            {isAdmin && (
+              <TabsTrigger value="admin" className="flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                Admin
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="dashboard">
@@ -69,6 +94,16 @@ const Index = () => {
           <TabsContent value="search">
             <SearchEquipment />
           </TabsContent>
+
+          <TabsContent value="profile">
+            <UserProfile />
+          </TabsContent>
+
+          {isAdmin && (
+            <TabsContent value="admin">
+              <AdminPortal />
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     </div>
