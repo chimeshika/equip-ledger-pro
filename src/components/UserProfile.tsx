@@ -9,10 +9,9 @@ import { useCurrentUser } from "@/hooks/useProfiles";
 import { useEquipment } from "@/hooks/useEquipment";
 import { User, Package, Calendar, Phone, Mail, Edit, Save, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 const UserProfile = () => {
-  const { data: currentUser, isLoading: isLoadingProfile } = useCurrentUser();
+  const { data: currentUser, isLoading: isLoadingProfile, updateProfile, isUpdating } = useCurrentUser();
   const { equipment, isLoading: isLoadingEquipment } = useEquipment();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
@@ -36,17 +35,7 @@ const UserProfile = () => {
     if (!currentUser) return;
 
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          full_name: editForm.full_name,
-          phone: editForm.phone,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', currentUser.id);
-
-      if (error) throw error;
-
+      updateProfile(editForm);
       toast({
         title: "Profile Updated",
         description: "Your profile has been successfully updated.",
@@ -129,11 +118,11 @@ const UserProfile = () => {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button onClick={handleSave} size="sm">
+                <Button onClick={handleSave} size="sm" disabled={isUpdating}>
                   <Save className="h-4 w-4 mr-2" />
-                  Save
+                  {isUpdating ? "Saving..." : "Save"}
                 </Button>
-                <Button variant="outline" onClick={() => setIsEditing(false)} size="sm">
+                <Button variant="outline" onClick={() => setIsEditing(false)} size="sm" disabled={isUpdating}>
                   <X className="h-4 w-4 mr-2" />
                   Cancel
                 </Button>

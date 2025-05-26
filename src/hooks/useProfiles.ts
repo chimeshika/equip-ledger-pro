@@ -80,8 +80,9 @@ export const useProfiles = () => {
 
 export const useCurrentUser = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  return useQuery({
+  const { data: currentUser, isLoading, refetch } = useQuery({
     queryKey: ['profile', user?.id],
     queryFn: async () => {
       if (!user) return null;
@@ -101,4 +102,35 @@ export const useCurrentUser = () => {
     },
     enabled: !!user,
   });
+
+  const updateProfileMutation = useMutation({
+    mutationFn: async (profileData: { full_name?: string; phone?: string }) => {
+      if (!user) throw new Error('User not authenticated');
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({
+          ...profileData,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['profiles'] });
+    },
+  });
+
+  return {
+    data: currentUser,
+    isLoading,
+    refetch,
+    updateProfile: updateProfileMutation.mutate,
+    isUpdating: updateProfileMutation.isPending,
+  };
 };
