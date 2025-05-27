@@ -1,5 +1,6 @@
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
 import Dashboard from "@/components/Dashboard";
 import AddEquipment from "@/components/AddEquipment";
 import AddRecords from "@/components/AddRecords";
@@ -7,57 +8,51 @@ import SearchEquipment from "@/components/SearchEquipment";
 import AdminPortal from "@/components/AdminPortal";
 import UserProfile from "@/components/UserProfile";
 import { useCurrentUser } from "@/hooks/useProfiles";
+import { useState } from "react";
 
 const Index = () => {
   const { data: currentUser } = useCurrentUser();
   const isAdmin = currentUser?.role === 'admin';
+  const [activeView, setActiveView] = useState("dashboard");
+
+  const renderActiveView = () => {
+    switch (activeView) {
+      case "dashboard":
+        return <Dashboard />;
+      case "add-equipment":
+        return <AddEquipment />;
+      case "add-records":
+        return <AddRecords />;
+      case "search":
+        return <SearchEquipment />;
+      case "admin":
+        return isAdmin ? <AdminPortal /> : <Dashboard />;
+      case "profile":
+        return <UserProfile />;
+      default:
+        return <Dashboard />;
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-800 mb-2">Equipment Management System</h1>
-          <p className="text-slate-600">Comprehensive equipment tracking and maintenance management</p>
-        </div>
-
-        <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 lg:w-fit">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="add-equipment">Add Equipment</TabsTrigger>
-            <TabsTrigger value="add-records">Add Records</TabsTrigger>
-            <TabsTrigger value="search">Search</TabsTrigger>
-            {isAdmin && <TabsTrigger value="admin">Admin</TabsTrigger>}
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="dashboard">
-            <Dashboard />
-          </TabsContent>
-
-          <TabsContent value="add-equipment">
-            <AddEquipment />
-          </TabsContent>
-
-          <TabsContent value="add-records">
-            <AddRecords />
-          </TabsContent>
-
-          <TabsContent value="search">
-            <SearchEquipment />
-          </TabsContent>
-
-          {isAdmin && (
-            <TabsContent value="admin">
-              <AdminPortal />
-            </TabsContent>
-          )}
-
-          <TabsContent value="profile">
-            <UserProfile />
-          </TabsContent>
-        </Tabs>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full">
+        <AppSidebar 
+          isAdmin={isAdmin} 
+          activeView={activeView} 
+          onViewChange={setActiveView} 
+        />
+        <SidebarInset>
+          <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold text-slate-800 mb-2">Equipment Management System</h1>
+              <p className="text-slate-600">Comprehensive equipment tracking and maintenance management</p>
+            </div>
+            {renderActiveView()}
+          </div>
+        </SidebarInset>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 

@@ -7,18 +7,26 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCurrentUser } from "@/hooks/useProfiles";
 import { useEquipment } from "@/hooks/useEquipment";
-import { User, Package, Calendar, Phone, Mail, Edit, Save, X } from "lucide-react";
+import { User, Package, Calendar, Phone, Mail, Edit, Save, X, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const UserProfile = () => {
   const { data: currentUser, isLoading: isLoadingProfile, updateProfile, isUpdating } = useCurrentUser();
   const { equipment, isLoading: isLoadingEquipment } = useEquipment();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [editForm, setEditForm] = useState({
     full_name: "",
     phone: "",
   });
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
   // Filter equipment created by current user
   const userEquipment = equipment.filter(item => item.created_by === currentUser?.id);
@@ -48,6 +56,57 @@ const UserProfile = () => {
         description: "Failed to update profile. Please try again.",
         variant: "destructive",
       });
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "New passwords do not match.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 6) {
+      toast({
+        title: "Error",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setPasswordLoading(true);
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: passwordForm.newPassword
+      });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: "Password updated successfully.",
+        });
+        setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+        setIsChangingPassword(false);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update password. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setPasswordLoading(false);
     }
   };
 
@@ -167,6 +226,65 @@ const UserProfile = () => {
             </div>
           )}
         </CardContent>
+      </Card>
+
+      {/* Password Change Section */}
+      <Card className="hover:shadow-md transition-shadow duration-200">
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5" />
+              Change Password
+            </CardTitle>
+            {!isChangingPassword && (
+              <Button variant="outline" size="sm" onClick={() => setIsChangingPassword(true)}>
+                <Lock className="h-4 w-4 mr-2" />
+                Change Password
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        {isChangingPassword && (
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="new_password">New Password</Label>
+                <Input
+                  id="new_password"
+                  type="password"
+                  value={passwordForm.newPassword}
+                  onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
+                  placeholder="Enter new password"
+                  minLength={6}
+                />
+              </div>
+              <div>
+                <Label htmlFor="confirm_password">Confirm New Password</Label>
+                <Input
+                  id="confirm_password"
+                  type="password"
+                  value={passwordForm.confirmPassword}
+                  onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                  placeholder="Confirm new password"
+                  minLength={6}
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={handlePasswordChange} size="sm" disabled={passwordLoading}>
+                  <Save className="h-4 w-4 mr-2" />
+                  {passwordLoading ? "Updating..." : "Update Password"}
+                </Button>
+                <Button variant="outline" onClick={() => {
+                  setIsChangingPassword(false);
+                  setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+                }} size="sm" disabled={passwordLoading}>
+                  <X className="h-4 w-4 mr-2" />
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        )}
       </Card>
 
       {/* Equipment Added by User */}
