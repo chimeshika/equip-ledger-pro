@@ -39,8 +39,7 @@ const Auth = () => {
         password,
         options: {
           data: {
-            first_name: firstName,
-            last_name: lastName,
+            full_name: `${firstName} ${lastName}`.trim(),
             phone: phone,
           }
         }
