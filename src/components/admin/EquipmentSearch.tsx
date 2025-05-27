@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,9 +32,11 @@ const EquipmentSearch = ({ onEquipmentFound, isSearching }: EquipmentSearchProps
   };
 
   // Notify parent component when equipment is found
-  if (selectedEquipment && selectedEquipment !== onEquipmentFound) {
-    onEquipmentFound(selectedEquipment);
-  }
+  useEffect(() => {
+    if (selectedEquipment) {
+      onEquipmentFound(selectedEquipment);
+    }
+  }, [selectedEquipment, onEquipmentFound]);
 
   return (
     <div>
