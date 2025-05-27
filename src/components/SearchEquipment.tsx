@@ -222,21 +222,21 @@ const SearchEquipment = () => {
             </CardContent>
           </Card>
 
-          {/* Repair History */}
+          {/* All Previous Records */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
-                Complete Repair History
+                Complete Record History
               </CardTitle>
               <CardDescription>
-                Chronological record of all repairs and maintenance activities
+                Chronological record of all repairs and updates
               </CardDescription>
             </CardHeader>
             <CardContent>
               {repairs.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-slate-600">No repair history available.</p>
+                  <p className="text-slate-600">No records available.</p>
                 </div>
               ) : (
                 <>
@@ -255,7 +255,7 @@ const SearchEquipment = () => {
                             <div className="text-right">
                               <p className="font-semibold text-lg">${repair.repair_cost.toFixed(2)}</p>
                               <Badge variant="outline" className="mt-1">
-                                Repair #{repair.id.slice(0, 8)}
+                                Record #{repair.id.slice(0, 8)}
                               </Badge>
                             </div>
                           </div>
@@ -263,7 +263,7 @@ const SearchEquipment = () => {
                             <div className="flex gap-2">
                               <Button variant="outline" size="sm">
                                 <FileText className="h-4 w-4 mr-2" />
-                                View Bill
+                                View Document
                               </Button>
                             </div>
                           )}
@@ -277,7 +277,7 @@ const SearchEquipment = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                       <div>
                         <p className="text-2xl font-bold text-slate-800">{repairs.length}</p>
-                        <p className="text-sm text-slate-600">Total Repairs</p>
+                        <p className="text-sm text-slate-600">Total Records</p>
                       </div>
                       <div>
                         <p className="text-2xl font-bold text-orange-600">${totalRepairCost.toFixed(2)}</p>
