@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { useEquipmentBySerial } from "@/hooks/useEquipment";
 import { useRepairs } from "@/hooks/useRepairs";
 import { useProfiles } from "@/hooks/useProfiles";
+import { supabase } from "@/integrations/supabase/client";
 
 const AddRecords = () => {
   const { toast } = useToast();
@@ -39,8 +40,9 @@ const AddRecords = () => {
 
   const [repairBill, setRepairBill] = useState<File | null>(null);
   const [updateDocument, setUpdateDocument] = useState<File | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  const { data: selectedEquipment, isLoading: isSearching } = useEquipmentBySerial(activeSearchSerial);
+  const { data: selectedEquipment, isLoading: isSearching, refetch: refetchEquipment } = useEquipmentBySerial(activeSearchSerial);
   const { repairs, addRepair, isAdding } = useRepairs(selectedEquipment?.id);
   const { profiles } = useProfiles();
 
@@ -93,7 +95,7 @@ const AddRecords = () => {
     setRepairBill(null);
   };
 
-  const handleUpdateSubmit = (e: React.FormEvent) => {
+  const handleUpdateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!selectedEquipment) {
@@ -105,22 +107,68 @@ const AddRecords = () => {
       return;
     }
 
-    // TODO: Implement equipment update functionality
-    toast({
-      title: "Update Submitted",
-      description: "Equipment update has been recorded",
-    });
+    setIsUpdating(true);
 
-    // Reset form
-    setUpdateData({
-      date: "",
-      condition: "",
-      assigned_to: "",
-      warranty_period: "",
-      warranty_expiry: "",
-      notes: ""
-    });
-    setUpdateDocument(null);
+    try {
+      // Prepare update data - only include fields that have values
+      const updateFields: any = {};
+      
+      if (updateData.condition) {
+        updateFields.condition = updateData.condition;
+      }
+      
+      if (updateData.assigned_to) {
+        updateFields.assigned_to = updateData.assigned_to;
+      }
+      
+      if (updateData.warranty_period) {
+        updateFields.warranty_period = updateData.warranty_period;
+      }
+      
+      if (updateData.warranty_expiry) {
+        updateFields.warranty_expiry = updateData.warranty_expiry;
+      }
+
+      // Add updated_at timestamp
+      updateFields.updated_at = new Date().toISOString();
+
+      // Update equipment in database
+      const { error } = await supabase
+        .from('equipment')
+        .update(updateFields)
+        .eq('id', selectedEquipment.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Equipment Updated",
+        description: "Equipment details have been successfully updated.",
+      });
+
+      // Refresh equipment data to show updated values
+      refetchEquipment();
+
+      // Reset form
+      setUpdateData({
+        date: "",
+        condition: "",
+        assigned_to: "",
+        warranty_period: "",
+        warranty_expiry: "",
+        notes: ""
+      });
+      setUpdateDocument(null);
+
+    } catch (error) {
+      console.error('Error updating equipment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update equipment. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const handleRepairFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -212,6 +260,19 @@ const AddRecords = () => {
               <div>
                 <p className="text-sm text-slate-500">Serial Number</p>
                 <p className="font-medium">{selectedEquipment.serial_number}</p>
+              </div>
+              <div>
+                <p className="text-sm text-slate-500">Warranty Period</p>
+                <p className="font-medium">{selectedEquipment.warranty_period || "Not specified"}</p>
+              </div>
+              <div>
+                <p className="text-sm text-slate-500">Warranty Expiry</p>
+                <p className="font-medium">
+                  {selectedEquipment.warranty_expiry 
+                    ? new Date(selectedEquipment.warranty_expiry).toLocaleDateString()
+                    : "Not specified"
+                  }
+                </p>
               </div>
             </div>
 
@@ -435,9 +496,9 @@ const AddRecords = () => {
                     </p>
                   </div>
 
-                  <Button type="submit">
+                  <Button type="submit" disabled={isUpdating}>
                     <Plus className="h-4 w-4 mr-2" />
-                    Add Update Record
+                    {isUpdating ? "Updating Equipment..." : "Add Update Record"}
                   </Button>
                 </form>
               )}
