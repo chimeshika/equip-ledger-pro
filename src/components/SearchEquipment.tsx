@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { Search, FileText, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useEquipmentBySerial } from "@/hooks/useEquipment";
 import { useRepairs } from "@/hooks/useRepairs";
+import { generateEquipmentPDF } from "@/utils/pdfGenerator";
 
 const SearchEquipment = () => {
   const { toast } = useToast();
@@ -31,11 +33,29 @@ const SearchEquipment = () => {
   };
 
   const generatePDF = () => {
-    // In a real app, this would generate and download a PDF
-    toast({
-      title: "PDF Generated",
-      description: "Equipment report has been generated and downloaded",
-    });
+    if (!searchResults) {
+      toast({
+        title: "Error",
+        description: "No equipment data available to export",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      generateEquipmentPDF(searchResults, repairs);
+      toast({
+        title: "PDF Generated",
+        description: "Equipment report has been generated and downloaded",
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const totalRepairCost = repairs.reduce((sum, repair) => sum + repair.repair_cost, 0);

@@ -4,12 +4,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FileText } from "lucide-react";
 import { Equipment } from "@/hooks/useEquipment";
+import { useNavigate } from "react-router-dom";
 
 interface EquipmentCardProps {
   equipment: Equipment;
 }
 
 const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
+  const navigate = useNavigate();
+
   const getConditionColor = (condition: string) => {
     switch (condition.toLowerCase()) {
       case "excellent": return "bg-green-100 text-green-800";
@@ -27,6 +30,10 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
     const now = new Date();
     const monthsUntilExpiry = (expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24 * 30);
     return monthsUntilExpiry <= 6 && monthsUntilExpiry > 0;
+  };
+
+  const handleViewDetails = () => {
+    navigate(`/equipment/${equipment.serial_number}`);
   };
 
   return (
@@ -73,7 +80,7 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
               : "No warranty information"
             }
           </div>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={handleViewDetails}>
             <FileText className="h-4 w-4 mr-2" />
             View Details
           </Button>
