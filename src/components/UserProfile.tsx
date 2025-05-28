@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 const UserProfile = () => {
-  const { data: currentUser, isLoading: isLoadingProfile, updateProfile, isUpdating } = useCurrentUser();
+  const { data: currentUser, isLoading: isLoadingProfile, updateProfile, isUpdating, refetch } = useCurrentUser();
   const { equipment, isLoading: isLoadingEquipment } = useEquipment();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
@@ -47,12 +48,14 @@ const UserProfile = () => {
     if (!currentUser) return;
 
     try {
-      updateProfile(editForm);
+      await updateProfile(editForm);
       toast({
         title: "Profile Updated",
         description: "Your profile has been successfully updated.",
       });
       setIsEditing(false);
+      // Refetch to get updated data
+      await refetch();
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
@@ -65,13 +68,15 @@ const UserProfile = () => {
 
   const handleCreateProfile = async () => {
     try {
-      updateProfile(newProfileForm);
+      await updateProfile(newProfileForm);
       toast({
         title: "Profile Created",
         description: "Your profile has been successfully created.",
       });
       setIsCreatingProfile(false);
       setNewProfileForm({ full_name: "", phone: "" });
+      // Refetch to get updated data and trigger re-render
+      await refetch();
     } catch (error) {
       console.error('Error creating profile:', error);
       toast({
@@ -146,47 +151,63 @@ const UserProfile = () => {
   // Show profile creation form if user has no profile data
   if (!currentUser || (!currentUser.full_name && !currentUser.phone)) {
     return (
-      <div className="space-y-6 animate-fade-in">
-        <Card className="hover:shadow-md transition-shadow duration-200">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <UserPlus className="h-5 w-5" />
+      <div className="space-y-6 animate-fade-in max-w-4xl mx-auto">
+        <Card className="hover:shadow-md transition-shadow duration-200 border-slate-200">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-slate-100">
+            <CardTitle className="flex items-center gap-2 text-slate-800">
+              <UserPlus className="h-5 w-5 text-blue-600" />
               Complete Your Profile
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-slate-600">
               Please add your profile information to get started
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6">
             {isCreatingProfile ? (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="new_full_name">Full Name</Label>
+                    <Label htmlFor="new_full_name" className="text-sm font-medium text-slate-700">
+                      Full Name *
+                    </Label>
                     <Input
                       id="new_full_name"
                       value={newProfileForm.full_name}
                       onChange={(e) => setNewProfileForm(prev => ({ ...prev, full_name: e.target.value }))}
                       placeholder="Enter your full name"
                       required
+                      className="mt-1"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="new_phone">Phone Number</Label>
+                    <Label htmlFor="new_phone" className="text-sm font-medium text-slate-700">
+                      Phone Number
+                    </Label>
                     <Input
                       id="new_phone"
                       value={newProfileForm.phone}
                       onChange={(e) => setNewProfileForm(prev => ({ ...prev, phone: e.target.value }))}
                       placeholder="Enter your phone number"
+                      className="mt-1"
                     />
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <Button onClick={handleCreateProfile} size="sm" disabled={isUpdating || !newProfileForm.full_name}>
+                <div className="flex gap-3">
+                  <Button 
+                    onClick={handleCreateProfile} 
+                    size="sm" 
+                    disabled={isUpdating || !newProfileForm.full_name}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
                     <Save className="h-4 w-4 mr-2" />
                     {isUpdating ? "Creating..." : "Create Profile"}
                   </Button>
-                  <Button variant="outline" onClick={() => setIsCreatingProfile(false)} size="sm" disabled={isUpdating}>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setIsCreatingProfile(false)} 
+                    size="sm" 
+                    disabled={isUpdating}
+                  >
                     <X className="h-4 w-4 mr-2" />
                     Cancel
                   </Button>
@@ -194,14 +215,16 @@ const UserProfile = () => {
               </div>
             ) : (
               <div className="text-center py-8">
-                <User className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-slate-600 mb-2">Profile Information Missing</h3>
-                <p className="text-slate-500 mb-4">Complete your profile to access all features.</p>
-                <div className="space-y-2 mb-4 text-sm text-slate-600">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <User className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-700 mb-2">Profile Information Missing</h3>
+                <p className="text-slate-500 mb-6">Complete your profile to access all features.</p>
+                <div className="space-y-2 mb-6 text-sm text-slate-600 bg-slate-50 p-4 rounded-lg">
                   <p><strong>Email:</strong> {currentUser?.email || "Not available"}</p>
                   <p><strong>Member Since:</strong> {currentUser?.created_at ? new Date(currentUser.created_at).toLocaleDateString() : "Unknown"}</p>
                 </div>
-                <Button onClick={() => setIsCreatingProfile(true)}>
+                <Button onClick={() => setIsCreatingProfile(true)} className="bg-blue-600 hover:bg-blue-700">
                   <UserPlus className="h-4 w-4 mr-2" />
                   Add Profile Information
                 </Button>
@@ -211,11 +234,11 @@ const UserProfile = () => {
         </Card>
 
         {/* Password Change Section - Always available */}
-        <Card className="hover:shadow-md transition-shadow duration-200">
-          <CardHeader>
+        <Card className="hover:shadow-md transition-shadow duration-200 border-slate-200">
+          <CardHeader className="bg-gradient-to-r from-red-50 to-orange-50 border-b border-slate-100">
             <div className="flex justify-between items-center">
-              <CardTitle className="flex items-center gap-2">
-                <Lock className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-slate-800">
+                <Lock className="h-5 w-5 text-red-600" />
                 Change Password
               </CardTitle>
               {!isChangingPassword && (
@@ -227,10 +250,10 @@ const UserProfile = () => {
             </div>
           </CardHeader>
           {isChangingPassword && (
-            <CardContent>
+            <CardContent className="p-6">
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="new_password">New Password</Label>
+                  <Label htmlFor="new_password" className="text-sm font-medium text-slate-700">New Password</Label>
                   <Input
                     id="new_password"
                     type="password"
@@ -238,10 +261,11 @@ const UserProfile = () => {
                     onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
                     placeholder="Enter new password"
                     minLength={6}
+                    className="mt-1"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="confirm_password">Confirm New Password</Label>
+                  <Label htmlFor="confirm_password" className="text-sm font-medium text-slate-700">Confirm New Password</Label>
                   <Input
                     id="confirm_password"
                     type="password"
@@ -249,9 +273,10 @@ const UserProfile = () => {
                     onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
                     placeholder="Confirm new password"
                     minLength={6}
+                    className="mt-1"
                   />
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   <Button onClick={handlePasswordChange} size="sm" disabled={passwordLoading}>
                     <Save className="h-4 w-4 mr-2" />
                     {passwordLoading ? "Updating..." : "Update Password"}
@@ -273,13 +298,13 @@ const UserProfile = () => {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in max-w-4xl mx-auto">
       {/* User Information */}
-      <Card className="hover:shadow-md transition-shadow duration-200">
-        <CardHeader>
+      <Card className="hover:shadow-md transition-shadow duration-200 border-slate-200">
+        <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 border-b border-slate-100">
           <div className="flex justify-between items-center">
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 text-slate-800">
+              <User className="h-5 w-5 text-green-600" />
               Profile Information
             </CardTitle>
             {!isEditing && (
@@ -290,30 +315,32 @@ const UserProfile = () => {
             )}
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           {isEditing ? (
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="full_name">Full Name</Label>
+                  <Label htmlFor="full_name" className="text-sm font-medium text-slate-700">Full Name</Label>
                   <Input
                     id="full_name"
                     value={editForm.full_name}
                     onChange={(e) => setEditForm(prev => ({ ...prev, full_name: e.target.value }))}
                     placeholder="Enter your full name"
+                    className="mt-1"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="phone">Phone Number</Label>
+                  <Label htmlFor="phone" className="text-sm font-medium text-slate-700">Phone Number</Label>
                   <Input
                     id="phone"
                     value={editForm.phone}
                     onChange={(e) => setEditForm(prev => ({ ...prev, phone: e.target.value }))}
                     placeholder="Enter your phone number"
+                    className="mt-1"
                   />
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <Button onClick={handleSave} size="sm" disabled={isUpdating}>
                   <Save className="h-4 w-4 mr-2" />
                   {isUpdating ? "Saving..." : "Save"}
@@ -331,21 +358,21 @@ const UserProfile = () => {
                   <User className="h-4 w-4" />
                   Full Name
                 </p>
-                <p className="font-medium text-lg">{currentUser.full_name || "Not specified"}</p>
+                <p className="font-medium text-lg text-slate-800">{currentUser.full_name || "Not specified"}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-slate-500 flex items-center gap-2">
                   <Mail className="h-4 w-4" />
                   Email
                 </p>
-                <p className="font-medium text-lg">{currentUser.email}</p>
+                <p className="font-medium text-lg text-slate-800">{currentUser.email}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-slate-500 flex items-center gap-2">
                   <Phone className="h-4 w-4" />
                   Phone Number
                 </p>
-                <p className="font-medium text-lg">{currentUser.phone || "Not specified"}</p>
+                <p className="font-medium text-lg text-slate-800">{currentUser.phone || "Not specified"}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-slate-500">Role</p>
@@ -358,7 +385,7 @@ const UserProfile = () => {
                   <Calendar className="h-4 w-4" />
                   Member Since
                 </p>
-                <p className="font-medium">{new Date(currentUser.created_at).toLocaleDateString()}</p>
+                <p className="font-medium text-slate-800">{new Date(currentUser.created_at).toLocaleDateString()}</p>
               </div>
             </div>
           )}
@@ -366,11 +393,11 @@ const UserProfile = () => {
       </Card>
 
       {/* Password Change Section */}
-      <Card className="hover:shadow-md transition-shadow duration-200">
-        <CardHeader>
+      <Card className="hover:shadow-md transition-shadow duration-200 border-slate-200">
+        <CardHeader className="bg-gradient-to-r from-red-50 to-orange-50 border-b border-slate-100">
           <div className="flex justify-between items-center">
-            <CardTitle className="flex items-center gap-2">
-              <Lock className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 text-slate-800">
+              <Lock className="h-5 w-5 text-red-600" />
               Change Password
             </CardTitle>
             {!isChangingPassword && (
@@ -382,10 +409,10 @@ const UserProfile = () => {
           </div>
         </CardHeader>
         {isChangingPassword && (
-          <CardContent>
+          <CardContent className="p-6">
             <div className="space-y-4">
               <div>
-                <Label htmlFor="new_password">New Password</Label>
+                <Label htmlFor="new_password" className="text-sm font-medium text-slate-700">New Password</Label>
                 <Input
                   id="new_password"
                   type="password"
@@ -393,10 +420,11 @@ const UserProfile = () => {
                   onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
                   placeholder="Enter new password"
                   minLength={6}
+                  className="mt-1"
                 />
               </div>
               <div>
-                <Label htmlFor="confirm_password">Confirm New Password</Label>
+                <Label htmlFor="confirm_password" className="text-sm font-medium text-slate-700">Confirm New Password</Label>
                 <Input
                   id="confirm_password"
                   type="password"
@@ -404,9 +432,10 @@ const UserProfile = () => {
                   onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
                   placeholder="Confirm new password"
                   minLength={6}
+                  className="mt-1"
                 />
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <Button onClick={handlePasswordChange} size="sm" disabled={passwordLoading}>
                   <Save className="h-4 w-4 mr-2" />
                   {passwordLoading ? "Updating..." : "Update Password"}
@@ -425,17 +454,17 @@ const UserProfile = () => {
       </Card>
 
       {/* Equipment Added by User */}
-      <Card className="hover:shadow-md transition-shadow duration-200">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5" />
+      <Card className="hover:shadow-md transition-shadow duration-200 border-slate-200">
+        <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b border-slate-100">
+          <CardTitle className="flex items-center gap-2 text-slate-800">
+            <Package className="h-5 w-5 text-purple-600" />
             My Equipment ({userEquipment.length})
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-slate-600">
             Equipment items you have added to the system
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           {isLoadingEquipment ? (
             <div className="text-center py-8">
               <div className="animate-pulse">
@@ -444,7 +473,9 @@ const UserProfile = () => {
             </div>
           ) : userEquipment.length === 0 ? (
             <div className="text-center py-8">
-              <Package className="h-12 w-12 text-slate-300 mx-auto mb-4" />
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Package className="h-8 w-8 text-white" />
+              </div>
               <p className="text-slate-500">You haven't added any equipment yet.</p>
               <p className="text-sm text-slate-400 mt-1">Start by adding your first piece of equipment!</p>
             </div>
@@ -455,7 +486,7 @@ const UserProfile = () => {
                   <CardContent className="p-4">
                     <div className="flex justify-between items-start mb-2">
                       <div>
-                        <h3 className="font-semibold">{item.item_name}</h3>
+                        <h3 className="font-semibold text-slate-800">{item.item_name}</h3>
                         <p className="text-sm text-slate-600">{item.brand} - {item.category}</p>
                         <p className="text-xs text-slate-500">Serial: {item.serial_number}</p>
                       </div>
@@ -470,19 +501,19 @@ const UserProfile = () => {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
                       <div>
                         <p className="text-slate-500">Assigned To</p>
-                        <p className="font-medium">{item.assigned_to || "Unassigned"}</p>
+                        <p className="font-medium text-slate-700">{item.assigned_to || "Unassigned"}</p>
                       </div>
                       <div>
                         <p className="text-slate-500">Location</p>
-                        <p className="font-medium">{item.location || "Not specified"}</p>
+                        <p className="font-medium text-slate-700">{item.location || "Not specified"}</p>
                       </div>
                       <div>
                         <p className="text-slate-500">Price</p>
-                        <p className="font-medium">${item.price || "Not specified"}</p>
+                        <p className="font-medium text-slate-700">${item.price || "Not specified"}</p>
                       </div>
                       <div>
                         <p className="text-slate-500">Supplier</p>
-                        <p className="font-medium">{item.supplier || "Not specified"}</p>
+                        <p className="font-medium text-slate-700">{item.supplier || "Not specified"}</p>
                       </div>
                     </div>
                   </CardContent>
