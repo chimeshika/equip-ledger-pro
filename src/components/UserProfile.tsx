@@ -10,6 +10,7 @@ import { useEquipment } from "@/hooks/useEquipment";
 import { User, Package, Calendar, Phone, Mail, Edit, Save, X, Lock, UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import ProfileAvatar from "./ProfileAvatar";
 
 const UserProfile = () => {
   const { data: currentUser, isLoading: isLoadingProfile, updateProfile, isUpdating, refetch } = useCurrentUser();
@@ -21,10 +22,13 @@ const UserProfile = () => {
   const [editForm, setEditForm] = useState({
     full_name: "",
     phone: "",
+    email: "",
+    avatar_url: "",
   });
   const [newProfileForm, setNewProfileForm] = useState({
     full_name: "",
     phone: "",
+    email: "",
   });
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
@@ -39,6 +43,8 @@ const UserProfile = () => {
       setEditForm({
         full_name: currentUser.full_name || "",
         phone: currentUser.phone || "",
+        email: currentUser.email || "",
+        avatar_url: currentUser.avatar_url || "",
       });
     }
   }, [currentUser]);
@@ -50,6 +56,8 @@ const UserProfile = () => {
     setEditForm({
       full_name: currentUser?.full_name || "",
       phone: currentUser?.phone || "",
+      email: currentUser?.email || "",
+      avatar_url: currentUser?.avatar_url || "",
     });
     setIsEditing(true);
   };
@@ -86,7 +94,7 @@ const UserProfile = () => {
         description: "Your profile has been successfully created.",
       });
       setIsCreatingProfile(false);
-      setNewProfileForm({ full_name: "", phone: "" });
+      setNewProfileForm({ full_name: "", phone: "", email: "" });
       // Force refetch and wait for completion
       setTimeout(async () => {
         await refetch();
@@ -152,6 +160,10 @@ const UserProfile = () => {
     }
   };
 
+  const handleAvatarUpdate = (avatarUrl: string | null) => {
+    setEditForm(prev => ({ ...prev, avatar_url: avatarUrl || "" }));
+  };
+
   if (isLoadingProfile) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -179,6 +191,13 @@ const UserProfile = () => {
           <CardContent className="p-6">
             {isCreatingProfile ? (
               <div className="space-y-6">
+                <div className="flex justify-center mb-6">
+                  <ProfileAvatar 
+                    currentUser={currentUser} 
+                    onAvatarUpdate={() => {}} 
+                    isEditing={false}
+                  />
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="new_full_name" className="text-sm font-medium text-slate-700">
@@ -202,6 +221,19 @@ const UserProfile = () => {
                       value={newProfileForm.phone}
                       onChange={(e) => setNewProfileForm(prev => ({ ...prev, phone: e.target.value }))}
                       placeholder="Enter your phone number"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <Label htmlFor="new_email" className="text-sm font-medium text-slate-700">
+                      Email Address
+                    </Label>
+                    <Input
+                      id="new_email"
+                      type="email"
+                      value={newProfileForm.email}
+                      onChange={(e) => setNewProfileForm(prev => ({ ...prev, email: e.target.value }))}
+                      placeholder="Enter your email address"
                       className="mt-1"
                     />
                   </div>
@@ -229,10 +261,12 @@ const UserProfile = () => {
               </div>
             ) : (
               <div className="text-center py-8">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <User className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-lg font-semibold text-slate-700 mb-2">Profile Information Missing</h3>
+                <ProfileAvatar 
+                  currentUser={currentUser} 
+                  onAvatarUpdate={() => {}} 
+                  isEditing={false}
+                />
+                <h3 className="text-lg font-semibold text-slate-700 mb-2 mt-4">Profile Information Missing</h3>
                 <p className="text-slate-500 mb-6">Complete your profile to access all features.</p>
                 <div className="space-y-2 mb-6 text-sm text-slate-600 bg-slate-50 p-4 rounded-lg">
                   <p><strong>Email:</strong> {currentUser?.email || "Not available"}</p>
@@ -332,6 +366,13 @@ const UserProfile = () => {
         <CardContent className="p-6">
           {isEditing ? (
             <div className="space-y-6">
+              <div className="flex justify-center mb-6">
+                <ProfileAvatar 
+                  currentUser={currentUser} 
+                  onAvatarUpdate={handleAvatarUpdate} 
+                  isEditing={true}
+                />
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="full_name" className="text-sm font-medium text-slate-700">Full Name</Label>
@@ -353,6 +394,17 @@ const UserProfile = () => {
                     className="mt-1"
                   />
                 </div>
+                <div className="md:col-span-2">
+                  <Label htmlFor="email" className="text-sm font-medium text-slate-700">Email Address</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={editForm.email}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, email: e.target.value }))}
+                    placeholder="Enter your email address"
+                    className="mt-1"
+                  />
+                </div>
               </div>
               <div className="flex gap-3">
                 <Button onClick={handleSave} size="sm" disabled={isUpdating}>
@@ -366,40 +418,49 @@ const UserProfile = () => {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-1">
-                <p className="text-sm text-slate-500 flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Full Name
-                </p>
-                <p className="font-medium text-lg text-slate-800">{currentUser.full_name || "Not specified"}</p>
+            <div className="space-y-6">
+              <div className="flex justify-center mb-6">
+                <ProfileAvatar 
+                  currentUser={currentUser} 
+                  onAvatarUpdate={() => {}} 
+                  isEditing={false}
+                />
               </div>
-              <div className="space-y-1">
-                <p className="text-sm text-slate-500 flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
-                  Email
-                </p>
-                <p className="font-medium text-lg text-slate-800">{currentUser.email}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-slate-500 flex items-center gap-2">
-                  <Phone className="h-4 w-4" />
-                  Phone Number
-                </p>
-                <p className="font-medium text-lg text-slate-800">{currentUser.phone || "Not specified"}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-slate-500">Role</p>
-                <Badge variant={currentUser.role === 'admin' ? 'default' : 'secondary'} className="text-sm">
-                  {currentUser.role === 'admin' ? 'Administrator' : 'User'}
-                </Badge>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-slate-500 flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Member Since
-                </p>
-                <p className="font-medium text-slate-800">{new Date(currentUser.created_at).toLocaleDateString()}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-1">
+                  <p className="text-sm text-slate-500 flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Full Name
+                  </p>
+                  <p className="font-medium text-lg text-slate-800">{currentUser.full_name || "Not specified"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-slate-500 flex items-center gap-2">
+                    <Mail className="h-4 w-4" />
+                    Email
+                  </p>
+                  <p className="font-medium text-lg text-slate-800">{currentUser.email}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-slate-500 flex items-center gap-2">
+                    <Phone className="h-4 w-4" />
+                    Phone Number
+                  </p>
+                  <p className="font-medium text-lg text-slate-800">{currentUser.phone || "Not specified"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-slate-500">Role</p>
+                  <Badge variant={currentUser.role === 'admin' ? 'default' : 'secondary'} className="text-sm">
+                    {currentUser.role === 'admin' ? 'Administrator' : 'User'}
+                  </Badge>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-slate-500 flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Member Since
+                  </p>
+                  <p className="font-medium text-slate-800">{new Date(currentUser.created_at).toLocaleDateString()}</p>
+                </div>
               </div>
             </div>
           )}

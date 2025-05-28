@@ -9,6 +9,7 @@ export interface Profile {
   email: string;
   full_name?: string;
   phone?: string;
+  avatar_url?: string;
   role: 'admin' | 'user';
   created_at: string;
   updated_at: string;
@@ -104,8 +105,21 @@ export const useCurrentUser = () => {
   });
 
   const updateProfileMutation = useMutation({
-    mutationFn: async (profileData: { full_name?: string; phone?: string }) => {
+    mutationFn: async (profileData: { 
+      full_name?: string; 
+      phone?: string; 
+      avatar_url?: string | null;
+      email?: string;
+    }) => {
       if (!user) throw new Error('User not authenticated');
+
+      // If email is being updated, update auth user email
+      if (profileData.email && profileData.email !== user.email) {
+        const { error: authError } = await supabase.auth.updateUser({
+          email: profileData.email
+        });
+        if (authError) throw authError;
+      }
 
       const { data, error } = await supabase
         .from('profiles')

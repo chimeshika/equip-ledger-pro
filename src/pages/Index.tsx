@@ -10,7 +10,6 @@ import UserProfile from "@/components/UserProfile";
 import { useCurrentUser } from "@/hooks/useProfiles";
 import { useState } from "react";
 import { Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const { data: currentUser } = useCurrentUser();
@@ -65,16 +64,19 @@ const Index = () => {
         />
         <SidebarInset className="flex-1">
           <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-            {/* Mobile Header with Navigation */}
-            <div className="md:hidden flex items-center gap-3 mb-6 bg-white p-4 rounded-lg shadow-lg border border-slate-200">
-              <SidebarTrigger>
-                <Button variant="ghost" size="sm" className="p-2 hover:bg-blue-50">
-                  <Menu className="h-5 w-5 text-slate-700" />
-                </Button>
-              </SidebarTrigger>
+            {/* Enhanced Mobile Header with Clear Navigation */}
+            <div className="md:hidden flex items-center gap-4 mb-6 bg-white p-4 rounded-xl shadow-lg border border-slate-200">
+              <div className="flex items-center justify-center">
+                <SidebarTrigger className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-colors">
+                  <Menu className="h-5 w-5 text-blue-700" />
+                </SidebarTrigger>
+              </div>
               <div className="flex-1">
                 <h1 className="text-lg font-semibold text-slate-800">{getPageTitle()}</h1>
-                <p className="text-sm text-slate-500">Equipment Management</p>
+                <p className="text-sm text-slate-500">Tap menu to navigate</p>
+              </div>
+              <div className="text-xs text-slate-400 px-2 py-1 bg-slate-100 rounded-full">
+                ☰ Menu
               </div>
             </div>
 
