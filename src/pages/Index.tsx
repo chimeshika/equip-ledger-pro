@@ -1,3 +1,4 @@
+
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import Dashboard from "@/components/Dashboard";
@@ -64,10 +65,14 @@ const Index = () => {
         />
         <SidebarInset className="flex-1">
           <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-            {/* Mobile Header */}
-            <div className="md:hidden flex items-center gap-3 mb-6 bg-white p-4 rounded-lg shadow-sm border border-slate-200">
-              <SidebarTrigger className="p-2" />
-              <div>
+            {/* Mobile Header with Navigation */}
+            <div className="md:hidden flex items-center gap-3 mb-6 bg-white p-4 rounded-lg shadow-lg border border-slate-200">
+              <SidebarTrigger>
+                <Button variant="ghost" size="sm" className="p-2 hover:bg-blue-50">
+                  <Menu className="h-5 w-5 text-slate-700" />
+                </Button>
+              </SidebarTrigger>
+              <div className="flex-1">
                 <h1 className="text-lg font-semibold text-slate-800">{getPageTitle()}</h1>
                 <p className="text-sm text-slate-500">Equipment Management</p>
               </div>

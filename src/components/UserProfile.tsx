@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,16 @@ const UserProfile = () => {
   });
   const [passwordLoading, setPasswordLoading] = useState(false);
 
+  // Update form data when currentUser changes
+  useEffect(() => {
+    if (currentUser) {
+      setEditForm({
+        full_name: currentUser.full_name || "",
+        phone: currentUser.phone || "",
+      });
+    }
+  }, [currentUser]);
+
   // Filter equipment created by current user
   const userEquipment = equipment.filter(item => item.created_by === currentUser?.id);
 
@@ -54,8 +64,10 @@ const UserProfile = () => {
         description: "Your profile has been successfully updated.",
       });
       setIsEditing(false);
-      // Refetch to get updated data
-      await refetch();
+      // Force refetch and wait for completion
+      setTimeout(async () => {
+        await refetch();
+      }, 500);
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
@@ -75,8 +87,10 @@ const UserProfile = () => {
       });
       setIsCreatingProfile(false);
       setNewProfileForm({ full_name: "", phone: "" });
-      // Refetch to get updated data and trigger re-render
-      await refetch();
+      // Force refetch and wait for completion
+      setTimeout(async () => {
+        await refetch();
+      }, 500);
     } catch (error) {
       console.error('Error creating profile:', error);
       toast({
