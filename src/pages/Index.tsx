@@ -56,27 +56,49 @@ const Index = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-slate-50">
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20">
         <AppSidebar 
           isAdmin={isAdmin} 
           activeView={activeView} 
           onViewChange={setActiveView} 
         />
         <SidebarInset className="flex-1">
-          <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-            {/* Enhanced Mobile Header with Clear Navigation */}
-            <div className="md:hidden flex items-center gap-4 mb-6 bg-white p-4 rounded-xl shadow-lg border border-slate-200">
-              <div className="flex items-center justify-center">
-                <SidebarTrigger className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-colors">
-                  <Menu className="h-5 w-5 text-blue-700" />
+          <div className="flex-1 space-y-4 p-0 md:p-8 md:pt-6">
+            {/* Enhanced Eye-Catching Mobile Header */}
+            <div className="md:hidden">
+              {/* Floating Action Button Style Hamburger Menu */}
+              <div className="fixed top-4 left-4 z-50">
+                <SidebarTrigger className="
+                  w-14 h-14 rounded-2xl 
+                  bg-gradient-to-br from-blue-600 to-purple-700 
+                  hover:from-blue-700 hover:to-purple-800
+                  shadow-xl hover:shadow-2xl
+                  border-0 text-white
+                  transition-all duration-300 ease-out
+                  hover:scale-110 active:scale-95
+                  animate-pulse hover:animate-none
+                  backdrop-blur-sm
+                  flex items-center justify-center
+                ">
+                  <Menu className="h-6 w-6" />
                 </SidebarTrigger>
               </div>
-              <div className="flex-1">
-                <h1 className="text-lg font-semibold text-slate-800">{getPageTitle()}</h1>
-                <p className="text-sm text-slate-500">Tap menu to navigate</p>
-              </div>
-              <div className="text-xs text-slate-400 px-2 py-1 bg-slate-100 rounded-full">
-                ☰ Menu
+
+              {/* Modern Mobile Header Bar */}
+              <div className="
+                bg-gradient-to-r from-blue-600/95 via-purple-600/95 to-indigo-600/95 
+                backdrop-blur-lg 
+                px-20 py-6 
+                shadow-lg
+                border-b border-white/20
+              ">
+                <div className="text-center">
+                  <h1 className="text-xl font-bold text-white mb-1">{getPageTitle()}</h1>
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <p className="text-blue-100 text-sm">Equipment Management</p>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -93,7 +115,7 @@ const Index = () => {
               </div>
             </div>
 
-            <div className="animate-fade-in">
+            <div className="animate-fade-in pt-4 md:pt-0">
               {renderActiveView()}
             </div>
           </div>
