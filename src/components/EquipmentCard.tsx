@@ -17,31 +17,31 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
     switch (condition.toLowerCase()) {
       case "excellent": 
         return { 
-          badge: "gradient-success text-white shadow-lg", 
+          badge: "badge-solid-success shadow-lg", 
           dot: "status-excellent",
           border: "border-green-200"
         };
       case "good": 
         return { 
-          badge: "gradient-info text-white shadow-lg", 
+          badge: "badge-solid-info shadow-lg", 
           dot: "status-good",
           border: "border-blue-200"
         };
       case "fair": 
         return { 
-          badge: "gradient-warning text-white shadow-lg", 
+          badge: "badge-solid-warning shadow-lg", 
           dot: "status-fair",
           border: "border-yellow-200"
         };
       case "poor": 
         return { 
-          badge: "gradient-danger text-white shadow-lg", 
+          badge: "badge-solid-danger shadow-lg", 
           dot: "status-poor",
           border: "border-orange-200"
         };
       case "out of service": 
         return { 
-          badge: "gradient-secondary text-white shadow-lg", 
+          badge: "badge-solid-secondary shadow-lg", 
           dot: "status-out-of-service",
           border: "border-red-200"
         };
@@ -71,14 +71,14 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
   return (
     <Card variant="floating" className={`relative overflow-hidden border-l-4 ${conditionConfig.border} group`}>
       {/* Animated Background Elements */}
-      <div className="absolute top-0 right-0 w-24 h-24 gradient-primary rounded-full opacity-5 -translate-y-12 translate-x-12 group-hover:scale-150 transition-transform duration-500"></div>
-      <div className="absolute bottom-0 left-0 w-16 h-16 gradient-secondary rounded-full opacity-5 translate-y-8 -translate-x-8 group-hover:scale-150 transition-transform duration-500"></div>
+      <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full -translate-y-12 translate-x-12 group-hover:scale-150 transition-transform duration-500"></div>
+      <div className="absolute bottom-0 left-0 w-16 h-16 bg-purple-500/5 rounded-full translate-y-8 -translate-x-8 group-hover:scale-150 transition-transform duration-500"></div>
 
       <CardContent className="p-6 relative z-10">
         {/* Header Section */}
         <div className="flex justify-between items-start mb-4">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 gradient-primary rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 bg-solid-blue rounded-2xl flex items-center justify-center shadow-lg">
               <Zap className="h-6 w-6 text-white" />
             </div>
             <div>
@@ -93,12 +93,12 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
           <div className="flex flex-col gap-2 items-end">
             <div className="flex items-center gap-2">
               <div className={conditionConfig.dot}></div>
-              <Badge className={`${conditionConfig.badge} border-0 font-semibold px-3 py-1`}>
+              <Badge className={`${conditionConfig.badge} border-0`}>
                 {equipment.condition}
               </Badge>
             </div>
             {isWarrantyExpiring() && (
-              <Badge className="gradient-danger text-white border-0 font-semibold px-3 py-1 animate-pulse-soft">
+              <Badge className="badge-solid-danger border-0 animate-pulse-soft">
                 Warranty Expiring
               </Badge>
             )}

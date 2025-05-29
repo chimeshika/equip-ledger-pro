@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -155,7 +154,48 @@
     box-shadow: 4px 0 24px 0 rgba(31, 38, 135, 0.1);
   }
 
-  /* Modern Gradients */
+  /* Solid Color Backgrounds for Better Readability */
+  .bg-solid-primary {
+    background: #667eea;
+  }
+
+  .bg-solid-secondary {
+    background: #f093fb;
+  }
+
+  .bg-solid-success {
+    background: #10B981;
+  }
+
+  .bg-solid-warning {
+    background: #F59E0B;
+  }
+
+  .bg-solid-danger {
+    background: #EF4444;
+  }
+
+  .bg-solid-info {
+    background: #3B82F6;
+  }
+
+  .bg-solid-purple {
+    background: #8B5CF6;
+  }
+
+  .bg-solid-orange {
+    background: #F97316;
+  }
+
+  .bg-solid-green {
+    background: #22C55E;
+  }
+
+  .bg-solid-blue {
+    background: #2563EB;
+  }
+
+  /* Modern Gradients (kept for backgrounds, not text containers) */
   .gradient-primary {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   }
@@ -256,23 +296,44 @@
   }
 
   .status-excellent {
-    @apply status-dot bg-gradient-to-r from-green-400 to-emerald-500;
+    @apply status-dot bg-green-500;
   }
 
   .status-good {
-    @apply status-dot bg-gradient-to-r from-blue-400 to-cyan-500;
+    @apply status-dot bg-blue-500;
   }
 
   .status-fair {
-    @apply status-dot bg-gradient-to-r from-yellow-400 to-orange-500;
+    @apply status-dot bg-yellow-500;
   }
 
   .status-poor {
-    @apply status-dot bg-gradient-to-r from-orange-400 to-red-500;
+    @apply status-dot bg-orange-500;
   }
 
   .status-out-of-service {
-    @apply status-dot bg-gradient-to-r from-red-500 to-pink-500;
+    @apply status-dot bg-red-500;
+  }
+
+  /* Badge Variants for Better Readability */
+  .badge-solid-success {
+    @apply bg-green-500 text-white border-0 font-semibold px-3 py-1;
+  }
+
+  .badge-solid-info {
+    @apply bg-blue-500 text-white border-0 font-semibold px-3 py-1;
+  }
+
+  .badge-solid-warning {
+    @apply bg-orange-500 text-white border-0 font-semibold px-3 py-1;
+  }
+
+  .badge-solid-danger {
+    @apply bg-red-500 text-white border-0 font-semibold px-3 py-1;
+  }
+
+  .badge-solid-secondary {
+    @apply bg-gray-500 text-white border-0 font-semibold px-3 py-1;
   }
 }
 

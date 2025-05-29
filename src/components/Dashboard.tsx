@@ -44,8 +44,8 @@ const Dashboard = () => {
       value: totalEquipment,
       subtitle: "Items registered",
       icon: Package,
-      gradient: "gradient-info",
-      iconBg: "bg-blue-500",
+      bgColor: "bg-solid-blue",
+      iconBg: "bg-blue-600",
       change: "+12%",
       trend: "up"
     },
@@ -54,8 +54,8 @@ const Dashboard = () => {
       value: activeEquipment,
       subtitle: "In working condition",
       icon: CheckCircle,
-      gradient: "gradient-success",
-      iconBg: "bg-green-500",
+      bgColor: "bg-solid-green",
+      iconBg: "bg-green-600",
       change: "+8%",
       trend: "up"
     },
@@ -64,8 +64,8 @@ const Dashboard = () => {
       value: warningEquipment,
       subtitle: "Expiring within 6 months",
       icon: AlertTriangle,
-      gradient: "gradient-warning",
-      iconBg: "bg-orange-500",
+      bgColor: "bg-solid-orange",
+      iconBg: "bg-orange-600",
       change: "-5%",
       trend: "down"
     }
@@ -73,10 +73,10 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Enhanced Statistics Cards */}
+      {/* Enhanced Statistics Cards with Solid Colors */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {stats.map((stat, index) => (
-          <Card key={stat.title} variant="floating" className={`${stat.gradient} relative overflow-hidden animate-scale-in`} style={{ animationDelay: `${index * 0.1}s` }}>
+          <Card key={stat.title} variant="floating" className={`${stat.bgColor} relative overflow-hidden animate-scale-in`} style={{ animationDelay: `${index * 0.1}s` }}>
             <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white/10 -translate-y-16 translate-x-16"></div>
             <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-white/5 translate-y-12 -translate-x-12"></div>
             
@@ -93,7 +93,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent className="relative z-10">
               <div className="text-4xl font-bold text-white mb-1">{stat.value}</div>
-              <p className="text-white/80 text-sm font-medium">{stat.subtitle}</p>
+              <p className="text-white/90 text-sm font-medium">{stat.subtitle}</p>
               <h3 className="text-white font-semibold mt-2">{stat.title}</h3>
             </CardContent>
           </Card>
@@ -116,7 +116,7 @@ const Dashboard = () => {
         <CardContent>
           {equipment.length === 0 ? (
             <div className="text-center py-12">
-              <div className="w-20 h-20 gradient-secondary rounded-3xl flex items-center justify-center mx-auto mb-6 animate-bounce-in">
+              <div className="w-20 h-20 bg-solid-blue rounded-3xl flex items-center justify-center mx-auto mb-6 animate-bounce-in">
                 <Package className="h-10 w-10 text-white" />
               </div>
               <h3 className="text-xl font-semibold text-slate-700 mb-2">No equipment registered yet</h3>
