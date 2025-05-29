@@ -2,7 +2,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, MapPin, User, DollarSign, Calendar, Zap } from "lucide-react";
+import { FileText, MapPin, User, DollarSign, Calendar, Zap, Package } from "lucide-react";
 import { Equipment } from "@/hooks/useEquipment";
 import { useNavigate } from "react-router-dom";
 
