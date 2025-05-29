@@ -9,7 +9,7 @@ import AdminPortal from "@/components/AdminPortal";
 import UserProfile from "@/components/UserProfile";
 import { useCurrentUser } from "@/hooks/useProfiles";
 import { useState } from "react";
-import { Menu } from "lucide-react";
+import { Menu, Zap } from "lucide-react";
 
 const Index = () => {
   const { data: currentUser } = useCurrentUser();
@@ -56,67 +56,81 @@ const Index = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20">
+      <div className="min-h-screen flex w-full gradient-primary">
         <AppSidebar 
           isAdmin={isAdmin} 
           activeView={activeView} 
           onViewChange={setActiveView} 
         />
         <SidebarInset className="flex-1">
-          <div className="flex-1 space-y-4 p-0 md:p-8 md:pt-6">
-            {/* Enhanced Eye-Catching Mobile Header */}
+          <div className="flex-1 space-y-6 p-0 md:p-8 md:pt-6">
+            {/* Ultra-Modern Eye-Catching Mobile Header */}
             <div className="md:hidden">
-              {/* Floating Action Button Style Hamburger Menu */}
-              <div className="fixed top-4 left-4 z-50">
+              {/* Revolutionary Floating Hamburger Menu */}
+              <div className="fixed top-6 left-4 z-50">
                 <SidebarTrigger className="
-                  w-14 h-14 rounded-2xl 
-                  bg-gradient-to-br from-blue-600 to-purple-700 
-                  hover:from-blue-700 hover:to-purple-800
-                  shadow-xl hover:shadow-2xl
-                  border-0 text-white
-                  transition-all duration-300 ease-out
+                  w-16 h-16 rounded-3xl 
+                  glass shadow-glow
+                  border-2 border-white/30
+                  transition-all duration-500 ease-out
                   hover:scale-110 active:scale-95
-                  animate-pulse hover:animate-none
-                  backdrop-blur-sm
+                  animate-pulse-soft hover:animate-none
                   flex items-center justify-center
+                  backdrop-blur-xl
+                  group
                 ">
-                  <Menu className="h-6 w-6" />
+                  <Menu className="h-7 w-7 text-white transition-transform duration-300 group-hover:rotate-180" />
+                  <div className="absolute -top-1 -right-1 w-4 h-4 gradient-warning rounded-full animate-bounce"></div>
                 </SidebarTrigger>
               </div>
 
-              {/* Modern Mobile Header Bar */}
-              <div className="
-                bg-gradient-to-r from-blue-600/95 via-purple-600/95 to-indigo-600/95 
-                backdrop-blur-lg 
-                px-20 py-6 
-                shadow-lg
-                border-b border-white/20
-              ">
-                <div className="text-center">
-                  <h1 className="text-xl font-bold text-white mb-1">{getPageTitle()}</h1>
+              {/* Stunning Mobile Header with Glass Morphism */}
+              <div className="mobile-header text-white shadow-float">
+                <div className="text-center pt-4">
+                  <div className="flex items-center justify-center gap-3 mb-3">
+                    <div className="w-10 h-10 glass rounded-2xl flex items-center justify-center shadow-lg animate-rotate-in">
+                      <Zap className="h-5 w-5 text-white" />
+                    </div>
+                    <h1 className="text-2xl font-bold tracking-tight">{getPageTitle()}</h1>
+                  </div>
                   <div className="flex items-center justify-center gap-2">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <p className="text-blue-100 text-sm">Equipment Management</p>
+                    <div className="status-excellent"></div>
+                    <p className="text-white/90 text-sm font-medium tracking-wide">Equipment Management Pro</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Desktop Header */}
-            <div className="hidden md:block mb-8">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <Menu className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-4xl font-bold text-slate-800 mb-2">Equipment Management System</h1>
-                  <p className="text-slate-600">Comprehensive equipment tracking and maintenance management</p>
+            {/* Premium Desktop Header */}
+            <div className="hidden md:block mb-8 animate-fade-in">
+              <div className="glass-card rounded-3xl p-8 shadow-float hover-lift">
+                <div className="flex items-center gap-6">
+                  <div className="w-16 h-16 gradient-primary rounded-3xl flex items-center justify-center shadow-glow animate-float">
+                    <Zap className="h-8 w-8 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="heading-modern text-4xl mb-2">Equipment Management System</h1>
+                    <p className="subtitle-modern text-lg">Advanced inventory tracking with intelligent insights</p>
+                    <div className="flex items-center gap-4 mt-4">
+                      <div className="flex items-center gap-2">
+                        <div className="status-excellent"></div>
+                        <span className="text-sm font-medium text-slate-600">System Online</span>
+                      </div>
+                      <div className="w-px h-4 bg-slate-300"></div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-slate-600">Pro Version</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="animate-fade-in pt-4 md:pt-0">
-              {renderActiveView()}
+            {/* Main Content Area with Enhanced Styling */}
+            <div className="animate-slide-up pt-4 md:pt-0">
+              <div className="glass-card rounded-3xl p-6 md:p-8 shadow-float min-h-[60vh]">
+                {renderActiveView()}
+              </div>
             </div>
           </div>
         </SidebarInset>
