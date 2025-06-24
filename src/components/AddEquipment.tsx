@@ -14,6 +14,7 @@ const AddEquipment = () => {
   const [formData, setFormData] = useState({
     item_name: "",
     category: "",
+    subcategory: "",
     brand: "",
     serial_number: "",
     purchase_date: "",
@@ -21,6 +22,8 @@ const AddEquipment = () => {
     price: "",
     warranty_period: "",
     warranty_expiry: "",
+    service_agreement_duration: "",
+    service_agreement_expiry: "",
     location: "",
     assigned_to: "",
     condition: "",
@@ -30,14 +33,52 @@ const AddEquipment = () => {
   const [attachments, setAttachments] = useState<File[]>([]);
 
   const categories = [
-    "Computer", "Mobile Device", "Printer", "Monitor", "Furniture", 
-    "Audio/Video", "Network Equipment", "Software", "Vehicle", "Other"
+    "Computers", 
+    "Desktop", 
+    "External hard drives", 
+    "Internal hard drives", 
+    "Headsets",
+    "Keyboards", 
+    "Landline phones",
+    "Laptops",
+    "Mice",
+    "Microphones",
+    "Speakers",
+    "UPS",
+    "Monitors",
+    "Multifunction printers",
+    "Type of Network",
+    "Pen Drive capacity",
+    "Laser Printers",
+    "Dot Matrix Printers",
+    "Ink Tank Printers", 
+    "Projectors",
+    "Routers"
   ];
+
+  const subcategories = {
+    "External hard drives": ["500GB", "1TB", "2TB", "4TB"],
+    "Internal hard drives": ["SATA", "SSD", "NVME", "M.2 SSD"],
+    "Keyboards": ["Keyboards", "Mouse"],
+    "Laptops": ["Laptops", "Charger", "Bag"],
+    "Monitors": ["LCD", "LED"],
+    "Multifunction printers": ["Black and White", "Color"],
+    "Type of Network": ["RJ 44", "USB Wi-Fi Dongles", "External", "Internal", "Network card internal"],
+    "Pen Drive capacity": ["8GB", "16GB", "32GB", "64GB", "128GB"],
+    "Laser Printers": ["Black and White", "Color"],
+    "Ink Tank Printers": ["Black and White", "Color"],
+    "Projectors": ["Projector screen 72\"", "Projector screen 92\"", "Projector screen 106\"", "Projector screen 120\"", "Projector Remote", "Projector bag"]
+  };
 
   const conditions = ["Excellent", "Good", "Fair", "Poor", "Out of Service"];
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => ({ 
+      ...prev, 
+      [field]: value,
+      // Reset subcategory when category changes
+      ...(field === 'category' && { subcategory: '' })
+    }));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,7 +93,7 @@ const AddEquipment = () => {
     // Prepare data for submission
     const equipmentData = {
       item_name: formData.item_name,
-      category: formData.category,
+      category: formData.subcategory ? `${formData.category} - ${formData.subcategory}` : formData.category,
       brand: formData.brand,
       serial_number: formData.serial_number,
       purchase_date: formData.purchase_date || null,
@@ -70,12 +111,14 @@ const AddEquipment = () => {
 
     // Reset form on success
     setFormData({
-      item_name: "", category: "", brand: "", serial_number: "", purchase_date: "",
-      supplier: "", price: "", warranty_period: "", warranty_expiry: "",
-      location: "", assigned_to: "", condition: "", notes: ""
+      item_name: "", category: "", subcategory: "", brand: "", serial_number: "", purchase_date: "",
+      supplier: "", price: "", warranty_period: "", warranty_expiry: "", service_agreement_duration: "",
+      service_agreement_expiry: "", location: "", assigned_to: "", condition: "", notes: ""
     });
     setAttachments([]);
   };
+
+  const showSubcategory = formData.category && subcategories[formData.category as keyof typeof subcategories];
 
   return (
     <Card>
@@ -90,7 +133,7 @@ const AddEquipment = () => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Basic Information */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-slate-800">Basic Information</h3>
@@ -119,6 +162,22 @@ const AddEquipment = () => {
                   </SelectContent>
                 </Select>
               </div>
+
+              {showSubcategory && (
+                <div>
+                  <Label htmlFor="subcategory">Specification *</Label>
+                  <Select value={formData.subcategory} onValueChange={(value) => handleInputChange("subcategory", value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select specification" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {subcategories[formData.category as keyof typeof subcategories].map((sub) => (
+                        <SelectItem key={sub} value={sub}>{sub}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               <div>
                 <Label htmlFor="brand">Brand/Model *</Label>
@@ -194,7 +253,7 @@ const AddEquipment = () => {
               </div>
 
               <div>
-                <Label htmlFor="warranty_period">Warranty Period</Label>
+                <Label htmlFor="warranty_period">Warranty Duration</Label>
                 <Input
                   id="warranty_period"
                   value={formData.warranty_period}
@@ -210,6 +269,26 @@ const AddEquipment = () => {
                   type="date"
                   value={formData.warranty_expiry}
                   onChange={(e) => handleInputChange("warranty_expiry", e.target.value)}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="service_agreement_duration">Service Agreement Duration</Label>
+                <Input
+                  id="service_agreement_duration"
+                  value={formData.service_agreement_duration}
+                  onChange={(e) => handleInputChange("service_agreement_duration", e.target.value)}
+                  placeholder="e.g., 2 years, 24 months"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="service_agreement_expiry">Service Agreement Expiry Date</Label>
+                <Input
+                  id="service_agreement_expiry"
+                  type="date"
+                  value={formData.service_agreement_expiry}
+                  onChange={(e) => handleInputChange("service_agreement_expiry", e.target.value)}
                 />
               </div>
             </div>

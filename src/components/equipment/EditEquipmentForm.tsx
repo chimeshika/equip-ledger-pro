@@ -27,6 +27,9 @@ const EditEquipmentForm = ({ equipment, onSave, onCancel }: EditEquipmentFormPro
     price: equipment.price || "",
     warranty_period: equipment.warranty_period || "",
     purchase_date: equipment.purchase_date || "",
+    warranty_expiry: equipment.warranty_expiry || "",
+    service_agreement_duration: "",
+    service_agreement_expiry: "",
     notes: equipment.notes || "",
   });
 
@@ -44,6 +47,30 @@ const EditEquipmentForm = ({ equipment, onSave, onCancel }: EditEquipmentFormPro
       [field]: value
     }));
   };
+
+  const categories = [
+    "Computers", 
+    "Desktop", 
+    "External hard drives", 
+    "Internal hard drives", 
+    "Headsets",
+    "Keyboards", 
+    "Landline phones",
+    "Laptops",
+    "Mice",
+    "Microphones",
+    "Speakers",
+    "UPS",
+    "Monitors",
+    "Multifunction printers",
+    "Type of Network",
+    "Pen Drive capacity",
+    "Laser Printers",
+    "Dot Matrix Printers",
+    "Ink Tank Printers", 
+    "Projectors",
+    "Routers"
+  ];
 
   return (
     <Card>
@@ -80,12 +107,9 @@ const EditEquipmentForm = ({ equipment, onSave, onCancel }: EditEquipmentFormPro
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Computer">Computer</SelectItem>
-                  <SelectItem value="Network">Network</SelectItem>
-                  <SelectItem value="Mobile">Mobile</SelectItem>
-                  <SelectItem value="Audio/Video">Audio/Video</SelectItem>
-                  <SelectItem value="Printer">Printer</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category}>{category}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -149,7 +173,7 @@ const EditEquipmentForm = ({ equipment, onSave, onCancel }: EditEquipmentFormPro
             </div>
 
             <div>
-              <Label htmlFor="warranty_period">Warranty Period</Label>
+              <Label htmlFor="warranty_period">Warranty Duration</Label>
               <Input
                 id="warranty_period"
                 value={formData.warranty_period}
@@ -165,6 +189,36 @@ const EditEquipmentForm = ({ equipment, onSave, onCancel }: EditEquipmentFormPro
                 type="date"
                 value={formData.purchase_date}
                 onChange={(e) => handleChange('purchase_date', e.target.value)}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="warranty_expiry">Warranty Expiry Date</Label>
+              <Input
+                id="warranty_expiry"
+                type="date"
+                value={formData.warranty_expiry}
+                onChange={(e) => handleChange('warranty_expiry', e.target.value)}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="service_agreement_duration">Service Agreement Duration</Label>
+              <Input
+                id="service_agreement_duration"
+                value={formData.service_agreement_duration}
+                onChange={(e) => handleChange('service_agreement_duration', e.target.value)}
+                placeholder="e.g., 2 years, 24 months"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="service_agreement_expiry">Service Agreement Expiry Date</Label>
+              <Input
+                id="service_agreement_expiry"
+                type="date"
+                value={formData.service_agreement_expiry}
+                onChange={(e) => handleChange('service_agreement_expiry', e.target.value)}
               />
             </div>
           </div>
