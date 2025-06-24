@@ -64,44 +64,42 @@ const Index = () => {
         />
         <SidebarInset className="flex-1">
           <div className="flex-1 space-y-6 p-0 md:p-8 md:pt-6">
-            {/* Ultra-Modern Eye-Catching Mobile Header */}
+            {/* Enhanced Mobile Header */}
             <div className="md:hidden">
-              {/* Revolutionary Floating Hamburger Menu */}
-              <div className="fixed top-6 left-4 z-50">
+              {/* Floating Navigation Button */}
+              <div className="fixed top-4 left-4 z-50">
                 <SidebarTrigger className="
-                  w-16 h-16 rounded-3xl 
+                  w-14 h-14 rounded-2xl 
                   glass shadow-glow
-                  border-2 border-white/30
-                  transition-all duration-500 ease-out
-                  hover:scale-110 active:scale-95
-                  animate-pulse-soft hover:animate-none
+                  border-2 border-white/20
+                  transition-all duration-300 ease-out
+                  hover:scale-105 active:scale-95
                   flex items-center justify-center
                   backdrop-blur-xl
                   group
                 ">
-                  <Menu className="h-7 w-7 text-white transition-transform duration-300 group-hover:rotate-180" />
-                  <div className="absolute -top-1 -right-1 w-4 h-4 gradient-warning rounded-full animate-bounce"></div>
+                  <Menu className="h-6 w-6 text-white transition-transform duration-300 group-hover:rotate-90" />
                 </SidebarTrigger>
               </div>
 
-              {/* Stunning Mobile Header with Glass Morphism */}
+              {/* Clean Mobile Header */}
               <div className="mobile-header text-white shadow-float">
-                <div className="text-center pt-4">
-                  <div className="flex items-center justify-center gap-3 mb-3">
-                    <div className="w-10 h-10 glass rounded-2xl flex items-center justify-center shadow-lg animate-rotate-in">
+                <div className="text-center pt-2 pb-4">
+                  <div className="flex items-center justify-center gap-3 mb-2">
+                    <div className="w-9 h-9 glass rounded-xl flex items-center justify-center shadow-lg">
                       <Zap className="h-5 w-5 text-white" />
                     </div>
-                    <h1 className="text-2xl font-bold tracking-tight">{getPageTitle()}</h1>
+                    <h1 className="text-xl font-bold tracking-tight">{getPageTitle()}</h1>
                   </div>
                   <div className="flex items-center justify-center gap-2">
                     <div className="status-excellent"></div>
-                    <p className="text-white/90 text-sm font-medium tracking-wide">Equipment Management Pro</p>
+                    <p className="text-white/90 text-sm font-medium">Equipment Management</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Premium Desktop Header */}
+            {/* Enhanced Desktop Header */}
             <div className="hidden md:block mb-8 animate-fade-in">
               <div className="glass-card rounded-3xl p-8 shadow-float hover-lift">
                 <div className="flex items-center gap-6">
@@ -110,15 +108,15 @@ const Index = () => {
                   </div>
                   <div>
                     <h1 className="heading-modern text-4xl mb-2">Equipment Management System</h1>
-                    <p className="subtitle-modern text-lg">Advanced inventory tracking with intelligent insights</p>
+                    <p className="subtitle-modern text-lg">Comprehensive inventory tracking and management</p>
                     <div className="flex items-center gap-4 mt-4">
                       <div className="flex items-center gap-2">
                         <div className="status-excellent"></div>
-                        <span className="text-sm font-medium text-slate-600">System Online</span>
+                        <span className="text-sm font-medium text-slate-600">System Active</span>
                       </div>
                       <div className="w-px h-4 bg-slate-300"></div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-slate-600">Pro Version</span>
+                        <span className="text-sm font-medium text-slate-600">Full Access</span>
                       </div>
                     </div>
                   </div>
@@ -126,9 +124,9 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Main Content Area with Enhanced Styling */}
+            {/* Main Content Area */}
             <div className="animate-slide-up pt-4 md:pt-0">
-              <div className="glass-card rounded-3xl p-6 md:p-8 shadow-float min-h-[60vh]">
+              <div className="glass-card rounded-3xl p-4 md:p-8 shadow-float min-h-[60vh]">
                 {renderActiveView()}
               </div>
             </div>
