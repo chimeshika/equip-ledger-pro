@@ -18,8 +18,10 @@ const SearchEquipment = () => {
   const [searchSerial, setSearchSerial] = useState("");
   const [activeSearchSerial, setActiveSearchSerial] = useState("");
   const [isScanning, setIsScanning] = useState(false);
+  const [showScannerOptions, setShowScannerOptions] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const scannerRef = useRef<QrScanner | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: searchResults, isLoading: isSearching } = useEquipmentBySerial(activeSearchSerial);
   const { repairs } = useRepairs(searchResults?.id);
@@ -37,6 +39,66 @@ const SearchEquipment = () => {
     setActiveSearchSerial(searchSerial.trim());
   };
 
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      toast({
+        title: "Processing QR Code",
+        description: "Reading QR code from uploaded image...",
+      });
+
+      const result = await QrScanner.scanImage(file);
+      
+      try {
+        // Parse QR code data - it should contain equipment info
+        const data = JSON.parse(result);
+        if (data.serial_number) {
+          setActiveSearchSerial(data.serial_number);
+          setSearchSerial(data.serial_number);
+          setShowScannerOptions(false);
+          toast({
+            title: "QR Code Read Successfully",
+            description: `Found equipment: ${data.serial_number}`,
+          });
+        } else {
+          throw new Error("Invalid QR code format");
+        }
+      } catch (error) {
+        // If parsing fails, treat as plain text serial number
+        setActiveSearchSerial(result);
+        setSearchSerial(result);
+        setShowScannerOptions(false);
+        toast({
+          title: "QR Code Read Successfully",
+          description: `Searching for: ${result}`,
+        });
+      }
+    } catch (error) {
+      console.error('Error reading QR code:', error);
+      toast({
+        title: "QR Code Error",
+        description: "Unable to read QR code from the image. Please try again.",
+        variant: "destructive"
+      });
+    }
+    
+    // Reset file input
+    if (event.target) {
+      event.target.value = '';
+    }
+  };
+
+  const startScannerOptions = () => {
+    setShowScannerOptions(true);
+  };
+
+  const closeScannerOptions = () => {
+    setShowScannerOptions(false);
+    stopQrScanner();
+  };
+
   const startQrScanner = async () => {
     if (!videoRef.current) return;
 
@@ -51,7 +113,7 @@ const SearchEquipment = () => {
             if (data.serial_number) {
               setActiveSearchSerial(data.serial_number);
               setSearchSerial(data.serial_number);
-              stopQrScanner();
+              closeScannerOptions();
               toast({
                 title: "QR Code Scanned",
                 description: `Found equipment: ${data.serial_number}`,
@@ -63,7 +125,7 @@ const SearchEquipment = () => {
             // If parsing fails, treat as plain text serial number
             setActiveSearchSerial(result.data);
             setSearchSerial(result.data);
-            stopQrScanner();
+            closeScannerOptions();
             toast({
               title: "QR Code Scanned",
               description: `Searching for: ${result.data}`,
@@ -180,33 +242,92 @@ const SearchEquipment = () => {
             
             <TabsContent value="qr" className="space-y-4">
               <div className="text-center space-y-4">
-                {!isScanning ? (
+                {!showScannerOptions ? (
                   <div className="space-y-4">
                     <div className="p-8 border-2 border-dashed border-gray-300 rounded-lg">
                       <QrCode className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                      <p className="text-gray-600 mb-4">Click to start QR scanner</p>
-                      <Button onClick={startQrScanner} className="flex items-center gap-2 mx-auto">
-                        <Camera className="h-4 w-4" />
+                      <p className="text-gray-600 mb-4">Scan QR code to find equipment</p>
+                      <Button onClick={startScannerOptions} className="flex items-center gap-2 mx-auto">
+                        <QrCode className="h-4 w-4" />
                         Start Scanner
                       </Button>
                     </div>
                   </div>
+                ) : !isScanning ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold">Choose Scan Method</h3>
+                      <Button
+                        onClick={closeScannerOptions}
+                        variant="ghost"
+                        size="sm"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Upload Image Option */}
+                      <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
+                        <div className="text-center space-y-3">
+                          <FileText className="h-12 w-12 mx-auto text-gray-400" />
+                          <h4 className="font-medium text-gray-900">Upload QR Image</h4>
+                          <p className="text-sm text-gray-600">Select a QR code image from your device</p>
+                          <Button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="flex items-center gap-2"
+                            variant="outline"
+                          >
+                            <FileText className="h-4 w-4" />
+                            Choose File
+                          </Button>
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileUpload}
+                            className="hidden"
+                          />
+                        </div>
+                      </div>
+                      
+                      {/* Camera Scan Option */}
+                      <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
+                        <div className="text-center space-y-3">
+                          <Camera className="h-12 w-12 mx-auto text-gray-400" />
+                          <h4 className="font-medium text-gray-900">Use Camera</h4>
+                          <p className="text-sm text-gray-600">Scan QR code using your device camera</p>
+                          <Button
+                            onClick={startQrScanner}
+                            className="flex items-center gap-2"
+                            variant="outline"
+                          >
+                            <Camera className="h-4 w-4" />
+                            Open Camera
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 ) : (
                   <div className="space-y-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold">Camera Scanner</h3>
+                      <Button
+                        onClick={closeScannerOptions}
+                        variant="destructive"
+                        size="sm"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    
                     <div className="relative">
                       <video
                         ref={videoRef}
                         className="w-full max-w-sm mx-auto rounded-lg border"
                         style={{ maxHeight: '400px' }}
                       />
-                      <Button
-                        onClick={stopQrScanner}
-                        variant="destructive"
-                        size="sm"
-                        className="absolute top-2 right-2"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
                     </div>
                     <p className="text-sm text-gray-600">
                       Position the QR code within the camera view to scan
