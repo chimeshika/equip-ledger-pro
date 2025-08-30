@@ -1,16 +1,22 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Plus, Download, QrCode } from "lucide-react";
 import { useEquipment } from "@/hooks/useEquipment";
+import QRCode from "qrcode";
+import { useToast } from "@/hooks/use-toast";
 
 const AddEquipment = () => {
   const { addEquipment, isAdding } = useEquipment();
+  const { toast } = useToast();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  
   const [formData, setFormData] = useState({
     item_name: "",
     category: "",
@@ -31,6 +37,9 @@ const AddEquipment = () => {
   });
 
   const [attachments, setAttachments] = useState<File[]>([]);
+  const [showQRDialog, setShowQRDialog] = useState(false);
+  const [qrCodeDataURL, setQrCodeDataURL] = useState<string>("");
+  const [addedEquipmentData, setAddedEquipmentData] = useState<any>(null);
 
   const categories = [
     "Computers", 
@@ -87,7 +96,60 @@ const AddEquipment = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const generateQRCode = async (equipmentData: any) => {
+    try {
+      const qrData = JSON.stringify({
+        item_name: equipmentData.item_name,
+        category: equipmentData.category,
+        brand: equipmentData.brand,
+        serial_number: equipmentData.serial_number,
+        purchase_date: equipmentData.purchase_date,
+        warranty_expiry: equipmentData.warranty_expiry,
+        service_agreement_expiry: formData.service_agreement_expiry,
+        location: equipmentData.location,
+        assigned_to: equipmentData.assigned_to,
+        condition: equipmentData.condition
+      });
+      
+      const qrDataURL = await QRCode.toDataURL(qrData, {
+        width: 300,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF'
+        }
+      });
+      
+      setQrCodeDataURL(qrDataURL);
+      setAddedEquipmentData(equipmentData);
+      setShowQRDialog(true);
+    } catch (error) {
+      console.error('Error generating QR code:', error);
+      toast({
+        title: "QR Code Error",
+        description: "Failed to generate QR code, but equipment was added successfully.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const downloadQRCode = () => {
+    if (!qrCodeDataURL) return;
+    
+    const link = document.createElement('a');
+    link.download = `equipment-qr-${formData.serial_number || 'code'}.png`;
+    link.href = qrCodeDataURL;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "QR Code Downloaded",
+      description: "QR code has been downloaded successfully.",
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Prepare data for submission
@@ -107,15 +169,22 @@ const AddEquipment = () => {
       notes: formData.notes || null,
     };
 
-    addEquipment(equipmentData);
-
-    // Reset form on success
-    setFormData({
-      item_name: "", category: "", subcategory: "", brand: "", serial_number: "", purchase_date: "",
-      supplier: "", price: "", warranty_period: "", warranty_expiry: "", service_agreement_duration: "",
-      service_agreement_expiry: "", location: "", assigned_to: "", condition: "", notes: ""
-    });
-    setAttachments([]);
+    try {
+      addEquipment(equipmentData);
+      
+      // Generate QR code after successful addition
+      await generateQRCode(equipmentData);
+      
+      // Reset form on success
+      setFormData({
+        item_name: "", category: "", subcategory: "", brand: "", serial_number: "", purchase_date: "",
+        supplier: "", price: "", warranty_period: "", warranty_expiry: "", service_agreement_duration: "",
+        service_agreement_expiry: "", location: "", assigned_to: "", condition: "", notes: ""
+      });
+      setAttachments([]);
+    } catch (error) {
+      console.error('Error adding equipment:', error);
+    }
   };
 
   const showSubcategory = formData.category && subcategories[formData.category as keyof typeof subcategories];
@@ -351,6 +420,48 @@ const AddEquipment = () => {
           </Button>
         </form>
       </CardContent>
+
+      {/* QR Code Dialog */}
+      <Dialog open={showQRDialog} onOpenChange={setShowQRDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <QrCode className="h-5 w-5" />
+              Equipment QR Code
+            </DialogTitle>
+            <DialogDescription>
+              QR code generated for {addedEquipmentData?.item_name}. Scan to view equipment details.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex justify-center py-6">
+            {qrCodeDataURL && (
+              <div className="border border-border rounded-lg p-4 bg-white">
+                <img 
+                  src={qrCodeDataURL} 
+                  alt="Equipment QR Code" 
+                  className="w-64 h-64 object-contain"
+                />
+              </div>
+            )}
+          </div>
+          
+          <div className="text-center text-sm text-muted-foreground">
+            <p><strong>Serial:</strong> {addedEquipmentData?.serial_number}</p>
+            <p><strong>Category:</strong> {addedEquipmentData?.category}</p>
+          </div>
+          
+          <DialogFooter className="flex flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={() => setShowQRDialog(false)}>
+              Close
+            </Button>
+            <Button onClick={downloadQRCode} className="flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              Download QR Code
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
