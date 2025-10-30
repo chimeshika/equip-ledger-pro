@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { useEffect } from 'react';
+import { signUpSchema, signInSchema } from '@/lib/validation';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -34,13 +34,33 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      // Validate input
+      const validationResult = signUpSchema.safeParse({
         email,
         password,
+        firstName,
+        lastName,
+        phone,
+      });
+
+      if (!validationResult.success) {
+        toast({
+          title: 'Validation Error',
+          description: validationResult.error.errors[0].message,
+          variant: 'destructive',
+        });
+        setLoading(false);
+        return;
+      }
+
+      const { error } = await supabase.auth.signUp({
+        email: validationResult.data.email,
+        password: validationResult.data.password,
         options: {
+          emailRedirectTo: `${window.location.origin}/`,
           data: {
-            full_name: `${firstName} ${lastName}`.trim(),
-            phone: phone,
+            full_name: `${validationResult.data.firstName} ${validationResult.data.lastName}`.trim(),
+            phone: validationResult.data.phone || null,
           }
         }
       });
@@ -79,9 +99,25 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      // Validate input
+      const validationResult = signInSchema.safeParse({
         email,
         password,
+      });
+
+      if (!validationResult.success) {
+        toast({
+          title: 'Validation Error',
+          description: validationResult.error.errors[0].message,
+          variant: 'destructive',
+        });
+        setLoading(false);
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: validationResult.data.email,
+        password: validationResult.data.password,
       });
 
       if (error) {

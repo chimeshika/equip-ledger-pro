@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { repairSchema } from '@/lib/validation';
 
 export interface Repair {
   id: string;
@@ -46,9 +47,15 @@ export const useRepairs = (equipmentId?: string) => {
     mutationFn: async (repairData: Omit<Repair, 'id' | 'created_at' | 'updated_at'>) => {
       if (!user) throw new Error('User not authenticated');
 
+      // Validate repair data
+      const validationResult = repairSchema.safeParse(repairData);
+      if (!validationResult.success) {
+        throw new Error(validationResult.error.errors[0].message);
+      }
+
       const { data, error } = await supabase
         .from('repairs')
-        .insert([repairData])
+        .insert([validationResult.data as any])
         .select()
         .single();
 

@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { profileUpdateSchema } from '@/lib/validation';
 
 export interface Profile {
   id: string;
@@ -10,9 +11,19 @@ export interface Profile {
   full_name?: string;
   phone?: string;
   avatar_url?: string;
-  role: 'admin' | 'user';
   created_at: string;
   updated_at: string;
+}
+
+export interface UserRole {
+  id: string;
+  user_id: string;
+  role: 'admin' | 'user';
+  created_at: string;
+}
+
+export interface ProfileWithRole extends Profile {
+  role?: 'admin' | 'user';
 }
 
 export const useProfiles = () => {
@@ -25,17 +36,31 @@ export const useProfiles = () => {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
+      // Fetch profiles
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching profiles:', error);
-        throw error;
-      }
+      if (profilesError) throw profilesError;
 
-      return data as Profile[];
+      // Fetch user roles
+      const { data: rolesData, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('*');
+
+      if (rolesError) throw rolesError;
+
+      // Merge profiles with their roles
+      const profilesWithRoles: ProfileWithRole[] = profilesData.map(profile => {
+        const userRole = rolesData.find(r => r.user_id === profile.id);
+        return {
+          ...profile,
+          role: userRole?.role || 'user'
+        };
+      });
+
+      return profilesWithRoles;
     },
     enabled: !!user,
   });
@@ -44,10 +69,16 @@ export const useProfiles = () => {
     mutationFn: async ({ userId, role }: { userId: string; role: 'admin' | 'user' }) => {
       if (!user) throw new Error('User not authenticated');
 
+      // Delete existing role
+      await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId);
+
+      // Insert new role
       const { data, error } = await supabase
-        .from('profiles')
-        .update({ role, updated_at: new Date().toISOString() })
-        .eq('id', userId)
+        .from('user_roles')
+        .insert({ user_id: userId, role })
         .select()
         .single();
 
@@ -88,18 +119,28 @@ export const useCurrentUser = () => {
     queryFn: async () => {
       if (!user) return null;
 
-      const { data, error } = await supabase
+      // Fetch profile
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
 
-      if (error) {
-        console.error('Error fetching current user profile:', error);
-        throw error;
-      }
+      if (profileError) throw profileError;
 
-      return data as Profile;
+      // Fetch user role
+      const { data: roleData, error: roleError } = await supabase
+        .from('user_roles')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (roleError) throw roleError;
+
+      return {
+        ...profileData,
+        role: roleData?.role || 'user'
+      } as ProfileWithRole;
     },
     enabled: !!user,
   });
@@ -113,10 +154,16 @@ export const useCurrentUser = () => {
     }) => {
       if (!user) throw new Error('User not authenticated');
 
+      // Validate profile data
+      const validationResult = profileUpdateSchema.safeParse(profileData);
+      if (!validationResult.success) {
+        throw new Error(validationResult.error.errors[0].message);
+      }
+
       // If email is being updated, update auth user email
-      if (profileData.email && profileData.email !== user.email) {
+      if (validationResult.data.email && validationResult.data.email !== user.email) {
         const { error: authError } = await supabase.auth.updateUser({
-          email: profileData.email
+          email: validationResult.data.email
         });
         if (authError) throw authError;
       }
@@ -124,7 +171,7 @@ export const useCurrentUser = () => {
       const { data, error } = await supabase
         .from('profiles')
         .update({
-          ...profileData,
+          ...validationResult.data,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id)

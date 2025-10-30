@@ -11,6 +11,7 @@ import { Plus, Download, QrCode } from "lucide-react";
 import { useEquipment } from "@/hooks/useEquipment";
 import QRCode from "qrcode";
 import { useToast } from "@/hooks/use-toast";
+import { equipmentSchema } from "@/lib/validation";
 
 const AddEquipment = () => {
   const { addEquipment, isAdding } = useEquipment();
@@ -152,28 +153,45 @@ const AddEquipment = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Prepare data for submission
+    // Prepare data for validation
     const equipmentData = {
       item_name: formData.item_name,
       category: formData.subcategory ? `${formData.category} - ${formData.subcategory}` : formData.category,
       brand: formData.brand,
       serial_number: formData.serial_number,
-      purchase_date: formData.purchase_date || null,
-      supplier: formData.supplier || null,
       price: formData.price ? parseFloat(formData.price) : null,
+      supplier: formData.supplier || null,
       warranty_period: formData.warranty_period || null,
-      warranty_expiry: formData.warranty_expiry || null,
       location: formData.location || null,
       assigned_to: formData.assigned_to || null,
       condition: formData.condition,
       notes: formData.notes || null,
     };
 
+    // Validate input
+    const validationResult = equipmentSchema.safeParse(equipmentData);
+
+    if (!validationResult.success) {
+      toast({
+        title: 'Validation Error',
+        description: validationResult.error.errors[0].message,
+        variant: 'destructive',
+      });
+      return;
+    }
+
     try {
-      addEquipment(equipmentData);
+      // Add dates after validation (these are not validated, just added)
+      const dataToSubmit: any = {
+        ...validationResult.data,
+        purchase_date: formData.purchase_date || null,
+        warranty_expiry: formData.warranty_expiry || null,
+      };
+
+      addEquipment(dataToSubmit);
       
       // Generate QR code after successful addition
-      await generateQRCode(equipmentData);
+      await generateQRCode(dataToSubmit);
       
       // Reset form on success
       setFormData({
@@ -182,8 +200,12 @@ const AddEquipment = () => {
         service_agreement_expiry: "", location: "", assigned_to: "", condition: "", notes: ""
       });
       setAttachments([]);
-    } catch (error) {
-      console.error('Error adding equipment:', error);
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to add equipment',
+        variant: 'destructive',
+      });
     }
   };
 
