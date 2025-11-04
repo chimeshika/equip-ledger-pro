@@ -8,6 +8,7 @@ import SearchEquipment from "@/components/SearchEquipment";
 import AdminPortal from "@/components/AdminPortal";
 import UserProfile from "@/components/UserProfile";
 import Reports from "@/components/Reports";
+import { GovernmentHeader } from "@/components/GovernmentHeader";
 import { useCurrentUser } from "@/hooks/useProfiles";
 import { useState } from "react";
 import { Menu, Zap } from "lucide-react";
@@ -61,13 +62,15 @@ const Index = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full gradient-primary">
-        <AppSidebar 
-          isAdmin={isAdmin} 
-          activeView={activeView} 
-          onViewChange={setActiveView} 
-        />
-        <SidebarInset className="flex-1">
+      <div className="min-h-screen flex w-full flex-col">
+        <GovernmentHeader />
+        <div className="flex flex-1 gradient-primary">
+          <AppSidebar 
+            isAdmin={isAdmin} 
+            activeView={activeView} 
+            onViewChange={setActiveView} 
+          />
+          <SidebarInset className="flex-1">
           <div className="flex-1 space-y-6 p-0 md:p-8 md:pt-6">
             {/* Enhanced Mobile Header */}
             <div className="md:hidden">
@@ -136,7 +139,8 @@ const Index = () => {
               </div>
             </div>
           </div>
-        </SidebarInset>
+          </SidebarInset>
+        </div>
       </div>
     </SidebarProvider>
   );
