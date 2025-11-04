@@ -9,9 +9,13 @@ import { useToast } from "@/hooks/use-toast";
 import { FileDown, FileSpreadsheet, FileText, Download } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import jsPDF from "jspdf";
 import * as XLSX from "xlsx";
 import { Document, Packer, Paragraph, Table as DocxTable, TableCell as DocxTableCell, TableRow as DocxTableRow, WidthType, TextRun } from "docx";
+import PurchaseAccessoriesReport from "./reports/PurchaseAccessoriesReport";
+import RepairServiceReport from "./reports/RepairServiceReport";
+import ComputerRegisterReport from "./reports/ComputerRegisterReport";
 
 interface FieldDefinition {
   key: string;
@@ -271,13 +275,26 @@ const Reports = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">Dynamic Reports</h2>
+        <h2 className="text-3xl font-bold tracking-tight">Reports</h2>
         <p className="text-muted-foreground">
-          Select fields to include in your report and export in your preferred format
+          Generate custom reports or use predefined report templates
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-[300px_1fr]">
+      <Tabs defaultValue="templates" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="templates">Report Templates</TabsTrigger>
+          <TabsTrigger value="custom">Custom Report</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="templates" className="space-y-6">
+          <PurchaseAccessoriesReport />
+          <RepairServiceReport />
+          <ComputerRegisterReport />
+        </TabsContent>
+
+        <TabsContent value="custom">
+          <div className="grid gap-6 md:grid-cols-[300px_1fr]">
         {/* Field Selection Panel */}
         <Card>
           <CardHeader>
@@ -412,7 +429,9 @@ const Reports = () => {
             )}
           </CardContent>
         </Card>
-      </div>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
