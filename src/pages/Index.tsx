@@ -7,6 +7,7 @@ import AddRecords from "@/components/AddRecords";
 import SearchEquipment from "@/components/SearchEquipment";
 import AdminPortal from "@/components/AdminPortal";
 import UserProfile from "@/components/UserProfile";
+import Reports from "@/components/Reports";
 import { useCurrentUser } from "@/hooks/useProfiles";
 import { useState } from "react";
 import { Menu, Zap } from "lucide-react";
@@ -26,6 +27,8 @@ const Index = () => {
         return <AddRecords />;
       case "search":
         return <SearchEquipment />;
+      case "reports":
+        return <Reports />;
       case "admin":
         return isAdmin ? <AdminPortal /> : <Dashboard />;
       case "profile":
@@ -45,6 +48,8 @@ const Index = () => {
         return "Add Records";
       case "search":
         return "Search Equipment";
+      case "reports":
+        return "Reports";
       case "admin":
         return "Admin Portal";
       case "profile":

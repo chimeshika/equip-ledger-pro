@@ -22,7 +22,8 @@ import {
   Settings, 
   User,
   LogOut,
-  X 
+  X,
+  BarChart3
 } from "lucide-react";
 
 interface AppSidebarProps {
@@ -55,6 +56,12 @@ const menuItems = [
     key: "search",
     icon: Search,
     color: "purple",
+  },
+  {
+    title: "Reports",
+    key: "reports",
+    icon: BarChart3,
+    color: "blue",
   },
 ];
 
