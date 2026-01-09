@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { signUpSchema, signInSchema } from '@/lib/validation';
 import { GovernmentHeader } from '@/components/GovernmentHeader';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -146,7 +147,10 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <div className="absolute top-4 right-4 z-10">
+        <ThemeToggle />
+      </div>
       <GovernmentHeader />
       <div className="flex items-center justify-center p-4 py-12">
         <Card className="w-full max-w-md">
