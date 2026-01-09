@@ -9,6 +9,7 @@ import AdminPortal from "@/components/AdminPortal";
 import UserProfile from "@/components/UserProfile";
 import Reports from "@/components/Reports";
 import { GovernmentHeader } from "@/components/GovernmentHeader";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useCurrentUser } from "@/hooks/useProfiles";
 import { useState } from "react";
 import { Menu, Zap } from "lucide-react";
@@ -92,7 +93,10 @@ const Index = () => {
 
               {/* Clean Mobile Header */}
               <div className="mobile-header text-white shadow-float">
-                <div className="text-center pt-2 pb-4">
+                <div className="text-center pt-2 pb-4 relative">
+                  <div className="absolute right-4 top-2">
+                    <ThemeToggle />
+                  </div>
                   <div className="flex items-center justify-center gap-3 mb-2">
                     <div className="w-9 h-9 glass rounded-xl flex items-center justify-center shadow-lg">
                       <Zap className="h-5 w-5 text-white" />
@@ -110,24 +114,27 @@ const Index = () => {
             {/* Enhanced Desktop Header */}
             <div className="hidden md:block mb-8 animate-fade-in">
               <div className="glass-card rounded-3xl p-8 shadow-float hover-lift">
-                <div className="flex items-center gap-6">
-                  <div className="w-16 h-16 gradient-primary rounded-3xl flex items-center justify-center shadow-glow animate-float">
-                    <Zap className="h-8 w-8 text-white" />
-                  </div>
-                  <div>
-                    <h1 className="heading-modern text-4xl mb-2">Equipment Management System</h1>
-                    <p className="subtitle-modern text-lg">Comprehensive inventory tracking and management</p>
-                    <div className="flex items-center gap-4 mt-4">
-                      <div className="flex items-center gap-2">
-                        <div className="status-excellent"></div>
-                        <span className="text-sm font-medium text-slate-600">System Active</span>
-                      </div>
-                      <div className="w-px h-4 bg-slate-300"></div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-slate-600">Full Access</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-6">
+                    <div className="w-16 h-16 gradient-primary rounded-3xl flex items-center justify-center shadow-glow animate-float">
+                      <Zap className="h-8 w-8 text-white" />
+                    </div>
+                    <div>
+                      <h1 className="heading-modern text-4xl mb-2">Equipment Management System</h1>
+                      <p className="subtitle-modern text-lg">Comprehensive inventory tracking and management</p>
+                      <div className="flex items-center gap-4 mt-4">
+                        <div className="flex items-center gap-2">
+                          <div className="status-excellent"></div>
+                          <span className="text-sm font-medium text-muted-foreground">System Active</span>
+                        </div>
+                        <div className="w-px h-4 bg-border"></div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-muted-foreground">Full Access</span>
+                        </div>
                       </div>
                     </div>
                   </div>
+                  <ThemeToggle />
                 </div>
               </div>
             </div>
