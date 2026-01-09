@@ -7,11 +7,24 @@ export const ThemeToggle = () => {
 
   useEffect(() => {
     const saved = localStorage.getItem("theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const prefersDark = mediaQuery.matches;
     const shouldBeDark = saved === "dark" || (!saved && prefersDark);
     
     setIsDark(shouldBeDark);
     document.documentElement.classList.toggle("dark", shouldBeDark);
+
+    // Listen for system preference changes (only applies when no saved preference)
+    const handleChange = (e: MediaQueryListEvent) => {
+      const saved = localStorage.getItem("theme");
+      if (!saved) {
+        setIsDark(e.matches);
+        document.documentElement.classList.toggle("dark", e.matches);
+      }
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
   const toggleTheme = () => {
