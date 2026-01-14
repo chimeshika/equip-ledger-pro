@@ -12,6 +12,8 @@ import { useCurrentUser } from "@/hooks/useProfiles";
 import { generateEquipmentPDF } from "@/utils/pdfGenerator";
 import { supabase } from "@/integrations/supabase/client";
 import EditEquipmentForm from "@/components/equipment/EditEquipmentForm";
+import { GovernmentHeader } from "@/components/GovernmentHeader";
+import { GovernmentFooter } from "@/components/GovernmentFooter";
 
 const EquipmentDetails = () => {
   const { serialNumber } = useParams<{ serialNumber: string }>();
@@ -76,16 +78,18 @@ const EquipmentDetails = () => {
 
   if (!equipment) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
-        <div className="max-w-4xl mx-auto">
+      <div className="min-h-screen bg-background flex flex-col">
+        <GovernmentHeader />
+        <div className="flex-1 max-w-4xl mx-auto p-6">
           <div className="text-center py-8">
-            <p className="text-slate-600">Equipment not found</p>
+            <p className="text-muted-foreground">Equipment not found</p>
             <Button onClick={() => navigate('/')} className="mt-4">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
           </div>
         </div>
+        <GovernmentFooter />
       </div>
     );
   }
@@ -93,7 +97,9 @@ const EquipmentDetails = () => {
   const totalRepairCost = repairs.reduce((sum, repair) => sum + repair.repair_cost, 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+    <div className="min-h-screen bg-background flex flex-col">
+      <GovernmentHeader />
+      <div className="flex-1 p-6">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex justify-between items-start">
@@ -294,6 +300,8 @@ const EquipmentDetails = () => {
           </CardContent>
         </Card>
       </div>
+      </div>
+      <GovernmentFooter />
     </div>
   );
 };
