@@ -9,6 +9,7 @@ import AdminPortal from "@/components/AdminPortal";
 import UserProfile from "@/components/UserProfile";
 import Reports from "@/components/Reports";
 import { GovernmentHeader } from "@/components/GovernmentHeader";
+import { GovernmentFooter } from "@/components/GovernmentFooter";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useCurrentUser } from "@/hooks/useProfiles";
 import { useState } from "react";
@@ -148,6 +149,7 @@ const Index = () => {
           </div>
           </SidebarInset>
         </div>
+        <GovernmentFooter />
       </div>
     </SidebarProvider>
   );
