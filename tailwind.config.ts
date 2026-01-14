@@ -18,6 +18,9 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: ['Source Sans 3', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -61,12 +64,27 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Government Color Palette
+				gov: {
+					maroon: 'hsl(348, 65%, 25%)',
+					navy: 'hsl(220, 50%, 20%)',
+					gold: 'hsl(42, 75%, 45%)',
+					success: 'hsl(160, 45%, 35%)',
+					warning: 'hsl(35, 70%, 45%)',
+					danger: 'hsl(0, 55%, 45%)',
+					info: 'hsl(200, 50%, 40%)',
 				}
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
+			},
+			boxShadow: {
+				'gov': '0 1px 3px 0 hsla(220, 30%, 15%, 0.06), 0 1px 2px 0 hsla(220, 30%, 15%, 0.04)',
+				'gov-md': '0 2px 6px 0 hsla(220, 30%, 15%, 0.08), 0 1px 3px 0 hsla(220, 30%, 15%, 0.05)',
+				'gov-lg': '0 4px 12px 0 hsla(220, 30%, 15%, 0.1), 0 2px 4px 0 hsla(220, 30%, 15%, 0.06)',
 			},
 			keyframes: {
 				'accordion-down': {
