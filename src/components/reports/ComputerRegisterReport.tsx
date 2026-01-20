@@ -7,6 +7,7 @@ import { FileDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import jsPDF from "jspdf";
+import { formatLKR } from "@/lib/currency";
 
 const ComputerRegisterReport = () => {
   const { toast } = useToast();
@@ -71,7 +72,7 @@ const ComputerRegisterReport = () => {
     addField("Serial Number", equipmentDetails.serial_number);
     addField("Category", equipmentDetails.category);
     addField("Purchase Date", equipmentDetails.purchase_date || "-");
-    addField("Price", String(equipmentDetails.price || "-"));
+    addField("Price (LKR)", equipmentDetails.price ? formatLKR(equipmentDetails.price) : "-");
     addField("Supplier", equipmentDetails.supplier || "-");
     addField("Condition", equipmentDetails.condition);
     addField("Location", equipmentDetails.location || "-");
@@ -141,8 +142,8 @@ const ComputerRegisterReport = () => {
                 <p className="font-medium">{equipmentDetails.purchase_date || "-"}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Price</p>
-                <p className="font-medium">{equipmentDetails.price || "-"}</p>
+                <p className="text-sm text-muted-foreground">Price (LKR)</p>
+                <p className="font-medium">{equipmentDetails.price ? formatLKR(equipmentDetails.price) : "-"}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Supplier</p>

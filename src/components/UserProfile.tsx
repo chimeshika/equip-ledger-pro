@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +10,7 @@ import { User, Package, Calendar, Phone, Mail, Edit, Save, X, Lock, UserPlus } f
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import ProfileAvatar from "./ProfileAvatar";
+import { formatLKRShort } from "@/lib/currency";
 
 const UserProfile = () => {
   const { data: currentUser, isLoading: isLoadingProfile, updateProfile, isUpdating, refetch } = useCurrentUser();
@@ -583,8 +583,8 @@ const UserProfile = () => {
                         <p className="font-medium text-slate-700">{item.location || "Not specified"}</p>
                       </div>
                       <div>
-                        <p className="text-slate-500">Price</p>
-                        <p className="font-medium text-slate-700">${item.price || "Not specified"}</p>
+                        <p className="text-slate-500">Price (LKR)</p>
+                        <p className="font-medium text-slate-700">{item.price ? formatLKRShort(item.price) : "Not specified"}</p>
                       </div>
                       <div>
                         <p className="text-slate-500">Supplier</p>

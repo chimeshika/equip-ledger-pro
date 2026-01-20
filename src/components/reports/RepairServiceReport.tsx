@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { FileDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
+import { formatLKR } from "@/lib/currency";
 
 const RepairServiceReport = () => {
   const { toast } = useToast();
@@ -48,7 +49,7 @@ const RepairServiceReport = () => {
     
     // Headers
     doc.setFont(undefined, "bold");
-    const headers = ["S/No", "Voucher No", "Date", "Description", "Amount ($)", "Staff Officer's Signature & Date"];
+    const headers = ["S/No", "Voucher No", "Date", "Description", "Amount (Rs.)", "Staff Officer's Signature & Date"];
     const colWidth = (doc.internal.pageSize.getWidth() - 20) / headers.length;
     headers.forEach((header, i) => {
       doc.text(header, 10 + i * colWidth, yPos);
@@ -62,7 +63,7 @@ const RepairServiceReport = () => {
       doc.text(row.equipment?.serial_number || "-", 10 + colWidth, yPos);
       doc.text(row.repair_date || "-", 10 + colWidth * 2, yPos);
       doc.text(row.description || "-", 10 + colWidth * 3, yPos);
-      doc.text(String(row.repair_cost || "-"), 10 + colWidth * 4, yPos);
+      doc.text(row.repair_cost ? formatLKR(row.repair_cost, false) : "-", 10 + colWidth * 4, yPos);
       doc.text("", 10 + colWidth * 5, yPos);
       yPos += 7;
       
@@ -99,7 +100,7 @@ const RepairServiceReport = () => {
                 <TableHead>Voucher No</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Description</TableHead>
-                <TableHead>Amount ($)</TableHead>
+                <TableHead>Amount (Rs.)</TableHead>
                 <TableHead>Staff Officer's Signature & Date</TableHead>
               </TableRow>
             </TableHeader>
@@ -110,7 +111,7 @@ const RepairServiceReport = () => {
                   <TableCell>{repair.equipment?.serial_number}</TableCell>
                   <TableCell>{repair.repair_date}</TableCell>
                   <TableCell>{repair.description}</TableCell>
-                  <TableCell>{repair.repair_cost}</TableCell>
+                  <TableCell>{repair.repair_cost ? formatLKR(repair.repair_cost) : "-"}</TableCell>
                   <TableCell></TableCell>
                 </TableRow>
               ))}

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useEquipmentBySerial } from "@/hooks/useEquipment";
 import { useRepairs } from "@/hooks/useRepairs";
 import { useProfiles } from "@/hooks/useProfiles";
+import { formatLKR } from "@/lib/currency";
 
 const RepairDetails = () => {
   const { toast } = useToast();
@@ -179,7 +179,7 @@ const RepairDetails = () => {
                             <p className="text-sm text-slate-600">{repair.notes}</p>
                           </div>
                           <div className="text-right">
-                            <p className="font-medium">${repair.repair_cost}</p>
+                            <p className="font-medium">{formatLKR(repair.repair_cost)}</p>
                             <p className="text-sm text-slate-500">{new Date(repair.repair_date).toLocaleDateString()}</p>
                           </div>
                         </div>
@@ -223,7 +223,7 @@ const RepairDetails = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="repair_cost">Repair Cost ($) *</Label>
+                  <Label htmlFor="repair_cost">Repair Cost (Rs.) *</Label>
                   <Input
                     id="repair_cost"
                     type="number"

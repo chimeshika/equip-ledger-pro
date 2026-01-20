@@ -1,7 +1,7 @@
-
 import jsPDF from 'jspdf';
 import { Equipment } from '@/hooks/useEquipment';
 import { Repair } from '@/hooks/useRepairs';
+import { formatLKR } from '@/lib/currency';
 
 export const generateEquipmentPDF = (equipment: Equipment, repairs: Repair[]) => {
   const doc = new jsPDF();
@@ -59,7 +59,7 @@ export const generateEquipmentPDF = (equipment: Equipment, repairs: Repair[]) =>
     ['Assigned To:', equipment.assigned_to || 'Unassigned'],
     ['Purchase Date:', equipment.purchase_date ? new Date(equipment.purchase_date).toLocaleDateString() : 'Not specified'],
     ['Supplier:', equipment.supplier || 'Not specified'],
-    ['Price:', equipment.price ? `$${equipment.price.toLocaleString()}` : 'Not specified'],
+    ['Price (LKR):', equipment.price ? formatLKR(equipment.price) : 'Not specified'],
     ['Warranty Period:', equipment.warranty_period || 'Not specified'],
   ];
   
@@ -100,9 +100,9 @@ export const generateEquipmentPDF = (equipment: Equipment, repairs: Repair[]) =>
     doc.setFont('helvetica', 'normal');
     
     const financialData = [
-      `Initial Cost: $${(equipment.price || 0).toLocaleString()}`,
-      `Total Repairs: $${totalRepairCost.toFixed(2)}`,
-      `Total Investment: $${totalInvestment.toFixed(2)}`
+      `Initial Cost: ${formatLKR(equipment.price || 0)}`,
+      `Total Repairs: ${formatLKR(totalRepairCost)}`,
+      `Total Investment: ${formatLKR(totalInvestment)}`
     ];
     
     financialData.forEach((data, index) => {
@@ -139,7 +139,7 @@ export const generateEquipmentPDF = (equipment: Equipment, repairs: Repair[]) =>
       doc.setFontSize(10);
       doc.setFont('helvetica', 'bold');
       doc.text(`Repair #${index + 1}`, margin + 5, yPosition);
-      doc.text(`$${repair.repair_cost.toFixed(2)}`, pageWidth - margin - 30, yPosition);
+      doc.text(formatLKR(repair.repair_cost), pageWidth - margin - 40, yPosition);
       
       yPosition += 6;
       doc.setFont('helvetica', 'normal');
@@ -165,8 +165,8 @@ export const generateEquipmentPDF = (equipment: Equipment, repairs: Repair[]) =>
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     doc.text(`Total Repairs: ${repairs.length}`, margin + 5, yPosition);
-    doc.text(`Total Cost: $${totalRepairCost.toFixed(2)}`, margin + 100, yPosition);
-    doc.text(`Average: $${(totalRepairCost / repairs.length).toFixed(2)}`, margin + 200, yPosition);
+    doc.text(`Total Cost: ${formatLKR(totalRepairCost)}`, margin + 80, yPosition);
+    doc.text(`Average: ${formatLKR(totalRepairCost / repairs.length)}`, margin + 170, yPosition);
   }
   
   // Footer

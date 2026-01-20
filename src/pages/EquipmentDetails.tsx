@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import EditEquipmentForm from "@/components/equipment/EditEquipmentForm";
 import { GovernmentHeader } from "@/components/GovernmentHeader";
 import { GovernmentFooter } from "@/components/GovernmentFooter";
+import { formatLKR } from "@/lib/currency";
 
 const EquipmentDetails = () => {
   const { serialNumber } = useParams<{ serialNumber: string }>();
@@ -191,9 +191,9 @@ const EquipmentDetails = () => {
                       <p className="font-medium">{equipment.supplier || "Not specified"}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-slate-500">Price</p>
+                      <p className="text-sm text-slate-500">Price (LKR)</p>
                       <p className="font-medium">
-                        {equipment.price ? `$${equipment.price.toLocaleString()}` : "Not specified"}
+                        {equipment.price ? formatLKR(equipment.price) : "Not specified"}
                       </p>
                     </div>
                     <div>
@@ -208,19 +208,19 @@ const EquipmentDetails = () => {
                   <h3 className="font-semibold text-slate-800 border-b pb-2">Financial Summary</h3>
                   <div className="space-y-2">
                     <div>
-                      <p className="text-sm text-slate-500">Initial Cost</p>
+                      <p className="text-sm text-slate-500">Initial Cost (LKR)</p>
                       <p className="font-medium">
-                        {equipment.price ? `$${equipment.price.toLocaleString()}` : "Not specified"}
+                        {equipment.price ? formatLKR(equipment.price) : "Not specified"}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-slate-500">Total Repair Cost</p>
-                      <p className="font-medium text-orange-600">${totalRepairCost.toFixed(2)}</p>
+                      <p className="text-sm text-slate-500">Total Repair Cost (LKR)</p>
+                      <p className="font-medium text-orange-600">{formatLKR(totalRepairCost)}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-slate-500">Total Investment</p>
+                      <p className="text-sm text-slate-500">Total Investment (LKR)</p>
                       <p className="font-medium text-slate-800">
-                        ${((equipment.price || 0) + totalRepairCost).toFixed(2)}
+                        {formatLKR((equipment.price || 0) + totalRepairCost)}
                       </p>
                     </div>
                   </div>
@@ -266,7 +266,7 @@ const EquipmentDetails = () => {
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-semibold text-lg">${repair.repair_cost.toFixed(2)}</p>
+                          <p className="font-semibold text-lg">{formatLKR(repair.repair_cost)}</p>
                           <Badge variant="outline" className="mt-1">
                             Repair #{repair.id.slice(0, 8)}
                           </Badge>
@@ -284,14 +284,14 @@ const EquipmentDetails = () => {
                       <p className="text-sm text-slate-600">Total Repairs</p>
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-orange-600">${totalRepairCost.toFixed(2)}</p>
-                      <p className="text-sm text-slate-600">Total Repair Cost</p>
+                      <p className="text-2xl font-bold text-orange-600">{formatLKR(totalRepairCost)}</p>
+                      <p className="text-sm text-slate-600">Total Repair Cost (LKR)</p>
                     </div>
                     <div>
                       <p className="text-2xl font-bold text-slate-800">
-                        {repairs.length > 0 ? `$${(totalRepairCost / repairs.length).toFixed(2)}` : "$0.00"}
+                        {repairs.length > 0 ? formatLKR(totalRepairCost / repairs.length) : "Rs. 0.00"}
                       </p>
-                      <p className="text-sm text-slate-600">Average Repair Cost</p>
+                      <p className="text-sm text-slate-600">Average Repair Cost (LKR)</p>
                     </div>
                   </div>
                 </div>

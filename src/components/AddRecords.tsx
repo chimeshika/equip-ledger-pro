@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,7 @@ import { useProfiles } from "@/hooks/useProfiles";
 import { supabase } from "@/integrations/supabase/client";
 import QrScanner from "qr-scanner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { formatLKR } from "@/lib/currency";
 
 const AddRecords = () => {
   const { toast } = useToast();
@@ -537,7 +537,7 @@ const AddRecords = () => {
                             <p className="text-sm text-slate-600">{repair.notes}</p>
                           </div>
                           <div className="text-right">
-                            <p className="font-medium">${repair.repair_cost}</p>
+                            <p className="font-medium">{formatLKR(repair.repair_cost)}</p>
                             <p className="text-sm text-slate-500">{new Date(repair.repair_date).toLocaleDateString()}</p>
                           </div>
                         </div>
@@ -598,7 +598,7 @@ const AddRecords = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="repair_cost">Repair Cost ($) *</Label>
+                      <Label htmlFor="repair_cost">Repair Cost (Rs.) *</Label>
                       <Input
                         id="repair_cost"
                         type="number"

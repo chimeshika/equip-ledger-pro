@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { FileDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
+import { formatLKR } from "@/lib/currency";
 
 const PurchaseAccessoriesReport = () => {
   const { toast } = useToast();
@@ -38,7 +39,7 @@ const PurchaseAccessoriesReport = () => {
     
     // Headers
     doc.setFont(undefined, "bold");
-    const headers = ["S/No", "Voucher No", "Date", "R/S", "Description", "Amount ($)", "Staff Officer's Signature & Date"];
+    const headers = ["S/No", "Voucher No", "Date", "R/S", "Description", "Amount (Rs.)", "Staff Officer's Signature & Date"];
     const colWidth = (doc.internal.pageSize.getWidth() - 20) / headers.length;
     headers.forEach((header, i) => {
       doc.text(header, 10 + i * colWidth, yPos);
@@ -53,7 +54,7 @@ const PurchaseAccessoriesReport = () => {
       doc.text(row.purchase_date || "-", 10 + colWidth * 2, yPos);
       doc.text("-", 10 + colWidth * 3, yPos);
       doc.text(row.item_name || "-", 10 + colWidth * 4, yPos);
-      doc.text(String(row.price || "-"), 10 + colWidth * 5, yPos);
+      doc.text(row.price ? formatLKR(row.price, false) : "-", 10 + colWidth * 5, yPos);
       doc.text("", 10 + colWidth * 6, yPos);
       yPos += 7;
       
@@ -88,7 +89,7 @@ const PurchaseAccessoriesReport = () => {
                 <TableHead>Date</TableHead>
                 <TableHead>R/S</TableHead>
                 <TableHead>Description</TableHead>
-                <TableHead>Amount ($)</TableHead>
+                <TableHead>Amount (Rs.)</TableHead>
                 <TableHead>Staff Officer's Signature & Date</TableHead>
               </TableRow>
             </TableHeader>
@@ -100,7 +101,7 @@ const PurchaseAccessoriesReport = () => {
                   <TableCell>{item.purchase_date}</TableCell>
                   <TableCell>-</TableCell>
                   <TableCell>{item.item_name}</TableCell>
-                  <TableCell>{item.price}</TableCell>
+                  <TableCell>{item.price ? formatLKR(item.price) : "-"}</TableCell>
                   <TableCell></TableCell>
                 </TableRow>
               ))}

@@ -6,7 +6,7 @@ export const equipmentSchema = z.object({
   category: z.string().min(1, "Category is required").max(100, "Category must be less than 100 characters"),
   brand: z.string().trim().min(1, "Brand is required").max(200, "Brand must be less than 200 characters"),
   serial_number: z.string().trim().min(1, "Serial number is required").max(100, "Serial number must be less than 100 characters"),
-  price: z.number().positive("Price must be positive").max(10000000, "Price seems too high").optional().nullable(),
+  price: z.number().positive("Price must be positive").max(100000000, "Price seems too high for LKR").optional().nullable(),
   notes: z.string().max(2000, "Notes must be less than 2000 characters").optional().nullable(),
   location: z.string().max(200, "Location must be less than 200 characters").optional().nullable(),
   assigned_to: z.string().max(200, "Assigned to must be less than 200 characters").optional().nullable(),
@@ -20,7 +20,7 @@ export const equipmentSchema = z.object({
 // Repair validation schema
 export const repairSchema = z.object({
   description: z.string().trim().min(1, "Description is required").max(500, "Description must be less than 500 characters"),
-  repair_cost: z.number().positive("Repair cost must be positive").max(1000000, "Repair cost seems too high"),
+  repair_cost: z.number().positive("Repair cost must be positive").max(10000000, "Repair cost seems too high for LKR"),
   repair_date: z.string().refine(date => !isNaN(Date.parse(date)), "Invalid date format"),
   notes: z.string().max(2000, "Notes must be less than 2000 characters").optional().nullable(),
   equipment_id: z.string().uuid("Invalid equipment ID"),
