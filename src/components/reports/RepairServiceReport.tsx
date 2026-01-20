@@ -48,7 +48,7 @@ const RepairServiceReport = () => {
     
     // Headers
     doc.setFont(undefined, "bold");
-    const headers = ["S/No", "Voucher No", "Date", "Description", "Amount Rs.", "Staff Officer's Signature & Date"];
+    const headers = ["S/No", "Voucher No", "Date", "Description", "Amount ($)", "Staff Officer's Signature & Date"];
     const colWidth = (doc.internal.pageSize.getWidth() - 20) / headers.length;
     headers.forEach((header, i) => {
       doc.text(header, 10 + i * colWidth, yPos);
@@ -99,7 +99,7 @@ const RepairServiceReport = () => {
                 <TableHead>Voucher No</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Description</TableHead>
-                <TableHead>Amount Rs.</TableHead>
+                <TableHead>Amount ($)</TableHead>
                 <TableHead>Staff Officer's Signature & Date</TableHead>
               </TableRow>
             </TableHeader>
