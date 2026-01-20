@@ -1,9 +1,9 @@
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Edit, Trash2 } from "lucide-react";
+import { formatLKRShort } from "@/lib/currency";
 
 interface EquipmentDetailsProps {
   equipment: any;
@@ -80,8 +80,8 @@ const EquipmentDetails = ({ equipment, onEdit, onDelete }: EquipmentDetailsProps
             <p className="font-medium">{equipment.location || "Not specified"}</p>
           </div>
           <div>
-            <p className="text-sm text-slate-500">Price</p>
-            <p className="font-medium">${equipment.price || "Not specified"}</p>
+            <p className="text-sm text-slate-500">Price (LKR)</p>
+            <p className="font-medium">{equipment.price ? formatLKRShort(equipment.price) : "Not specified"}</p>
           </div>
         </div>
       </CardContent>

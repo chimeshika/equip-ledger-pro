@@ -1,9 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, MapPin, User, DollarSign, Calendar, Package } from "lucide-react";
+import { FileText, MapPin, User, Banknote, Calendar, Package } from "lucide-react";
 import { Equipment } from "@/hooks/useEquipment";
 import { useNavigate } from "react-router-dom";
+import { formatLKRShort } from "@/lib/currency";
 
 interface EquipmentCardProps {
   equipment: Equipment;
@@ -128,11 +129,11 @@ const EquipmentCard = ({ equipment }: EquipmentCardProps) => {
           
           <div className="bg-muted/50 rounded p-2 text-center">
             <div className="flex items-center justify-center mb-1">
-              <DollarSign className="h-3 w-3 text-muted-foreground" />
+              <Banknote className="h-3 w-3 text-muted-foreground" />
             </div>
-            <p className="text-xs text-muted-foreground mb-0.5">Price</p>
+            <p className="text-xs text-muted-foreground mb-0.5">Price (LKR)</p>
             <p className="font-medium text-foreground text-xs">
-              {equipment.price ? `$${equipment.price.toLocaleString()}` : "N/A"}
+              {equipment.price ? formatLKRShort(equipment.price) : "N/A"}
             </p>
           </div>
         </div>
