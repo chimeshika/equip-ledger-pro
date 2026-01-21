@@ -15,15 +15,17 @@ export interface Profile {
   updated_at: string;
 }
 
+export type AppRole = 'admin' | 'user' | 'branch_head' | 'it_unit' | 'officer';
+
 export interface UserRole {
   id: string;
   user_id: string;
-  role: 'admin' | 'user';
+  role: AppRole;
   created_at: string;
 }
 
 export interface ProfileWithRole extends Profile {
-  role?: 'admin' | 'user';
+  role?: AppRole;
 }
 
 export const useProfiles = () => {
@@ -66,7 +68,7 @@ export const useProfiles = () => {
   });
 
   const updateRoleMutation = useMutation({
-    mutationFn: async ({ userId, role }: { userId: string; role: 'admin' | 'user' }) => {
+    mutationFn: async ({ userId, role }: { userId: string; role: AppRole }) => {
       if (!user) throw new Error('User not authenticated');
 
       // Delete existing role
