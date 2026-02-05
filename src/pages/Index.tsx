@@ -8,6 +8,7 @@ import SearchEquipment from "@/components/SearchEquipment";
 import AdminPortal from "@/components/AdminPortal";
 import UserProfile from "@/components/UserProfile";
 import Reports from "@/components/Reports";
+ import { RepairWorkflow } from "@/components/repairs/RepairWorkflow";
 import { GovernmentHeader } from "@/components/GovernmentHeader";
 import { GovernmentFooter } from "@/components/GovernmentFooter";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -32,6 +33,8 @@ const Index = () => {
         return <SearchEquipment />;
       case "reports":
         return <Reports />;
+       case "repairs":
+         return <RepairWorkflow />;
       case "admin":
         return isAdmin ? <AdminPortal /> : <Dashboard />;
       case "profile":
@@ -53,6 +56,8 @@ const Index = () => {
         return "Search Equipment";
       case "reports":
         return "Reports";
+       case "repairs":
+         return "Repair Requests";
       case "admin":
         return "Admin Portal";
       case "profile":
