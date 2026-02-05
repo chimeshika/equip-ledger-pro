@@ -2,6 +2,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import type { Database } from '@/integrations/supabase/types';
+
+type AppRole = Database['public']['Enums']['app_role'];
 
 export interface Branch {
   id: string;
@@ -19,7 +22,7 @@ export interface UserBranchAssignment {
   user_id: string;
   branch_id: string;
   requested_role: 'admin' | 'user' | 'branch_head' | 'it_unit' | 'officer';
-  status: 'pending' | 'approved' | 'rejected';
+  status: string;
   approved_by?: string;
   approved_at?: string;
   created_at: string;
@@ -188,17 +191,17 @@ export const useUserBranchAssignment = () => {
   });
 
   const requestAssignmentMutation = useMutation({
-    mutationFn: async ({ branchId, requestedRole }: { branchId: string; requestedRole: string }) => {
+    mutationFn: async ({ branchId, requestedRole }: { branchId: string; requestedRole: AppRole }) => {
       if (!user) throw new Error('User not authenticated');
 
       const { data, error } = await supabase
         .from('user_branch_assignments')
-        .insert([{
+        .insert({
           user_id: user.id,
           branch_id: branchId,
           requested_role: requestedRole,
           status: 'pending'
-        }])
+        })
         .select()
         .single();
 
@@ -240,12 +243,12 @@ export const useBranchAssignments = () => {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
+      // First fetch assignments with branches
+      const { data: assignmentsData, error } = await supabase
         .from('user_branch_assignments')
         .select(`
           *,
-          branch:branches(*),
-          profile:profiles!user_branch_assignments_user_id_fkey(id, email, full_name)
+          branch:branches(*)
         `)
         .order('created_at', { ascending: false });
 
@@ -254,13 +257,27 @@ export const useBranchAssignments = () => {
         throw error;
       }
 
-      return data as UserBranchAssignment[];
+      if (!assignmentsData || assignmentsData.length === 0) return [];
+
+      // Fetch profiles separately since there's no direct FK
+      const userIds = assignmentsData.map(a => a.user_id);
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('id, email, full_name')
+        .in('id', userIds);
+
+      const profilesMap = new Map(profilesData?.map(p => [p.id, p]) || []);
+
+      return assignmentsData.map(assignment => ({
+        ...assignment,
+        profile: profilesMap.get(assignment.user_id)
+      })) as unknown as UserBranchAssignment[];
     },
     enabled: !!user,
   });
 
   const approveAssignmentMutation = useMutation({
-    mutationFn: async ({ assignmentId, userId, role }: { assignmentId: string; userId: string; role: string }) => {
+    mutationFn: async ({ assignmentId, userId, role }: { assignmentId: string; userId: string; role: AppRole }) => {
       if (!user) throw new Error('User not authenticated');
 
       // Update assignment status
@@ -283,7 +300,7 @@ export const useBranchAssignments = () => {
 
       const { error: roleError } = await supabase
         .from('user_roles')
-        .insert({ user_id: userId, role });
+        .insert({ user_id: userId, role: role });
 
       if (roleError) throw roleError;
     },

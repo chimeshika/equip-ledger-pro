@@ -61,8 +61,6 @@ export const useRepairRequests = (filter?: 'my' | 'branch' | 'approved' | 'all')
         .from('repair_requests')
         .select(`
           *,
-          equipment:equipment(id, item_name, serial_number, brand),
-          requester:profiles!repair_requests_requested_by_fkey(id, email, full_name),
           branch:branches(id, name, code)
         `)
         .order('created_at', { ascending: false });
@@ -73,14 +71,38 @@ export const useRepairRequests = (filter?: 'my' | 'branch' | 'approved' | 'all')
         query = query.in('status', ['approved', 'in_progress', 'completed']);
       }
 
-      const { data, error } = await query;
+      const { data: requestsData, error } = await query;
 
       if (error) {
         console.error('Error fetching repair requests:', error);
         throw error;
       }
 
-      return data as RepairRequest[];
+      if (!requestsData || requestsData.length === 0) return [];
+
+      // Fetch equipment and requester profiles separately
+      const equipmentIds = [...new Set(requestsData.map(r => r.equipment_id))];
+      const requesterIds = [...new Set(requestsData.map(r => r.requested_by))];
+
+      const [equipmentResult, profilesResult] = await Promise.all([
+        supabase
+          .from('equipment')
+          .select('id, item_name, serial_number, brand')
+          .in('id', equipmentIds),
+        supabase
+          .from('profiles')
+          .select('id, email, full_name')
+          .in('id', requesterIds)
+      ]);
+
+      const equipmentMap = new Map(equipmentResult.data?.map(e => [e.id, e]) || []);
+      const profilesMap = new Map(profilesResult.data?.map(p => [p.id, p]) || []);
+
+      return requestsData.map(request => ({
+        ...request,
+        equipment: equipmentMap.get(request.equipment_id),
+        requester: profilesMap.get(request.requested_by)
+      })) as RepairRequest[];
     },
     enabled: !!user,
   });
