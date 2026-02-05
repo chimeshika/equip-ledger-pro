@@ -23,7 +23,8 @@ import {
   LogOut,
   X,
   BarChart3,
-  Shield
+   Shield,
+   Wrench
 } from "lucide-react";
 
 interface AppSidebarProps {
@@ -58,6 +59,11 @@ const menuItems = [
     key: "reports",
     icon: BarChart3,
   },
+   {
+     title: "Repairs",
+     key: "repairs",
+     icon: Wrench,
+   },
 ];
 
 const adminItems = [
