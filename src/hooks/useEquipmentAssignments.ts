@@ -48,7 +48,6 @@ export const useEquipmentAssignments = (filter?: 'my' | 'branch' | 'all') => {
         .select(`
           *,
           equipment:equipment(id, item_name, serial_number, brand, category, condition),
-          officer:profiles!equipment_assignments_officer_id_fkey(id, email, full_name),
           branch:branches(id, name, code)
         `)
         .eq('is_active', true)
@@ -58,14 +57,28 @@ export const useEquipmentAssignments = (filter?: 'my' | 'branch' | 'all') => {
         query = query.eq('officer_id', user.id);
       }
 
-      const { data, error } = await query;
+      const { data: assignmentsData, error } = await query;
 
       if (error) {
         console.error('Error fetching equipment assignments:', error);
         throw error;
       }
 
-      return data as EquipmentAssignment[];
+      if (!assignmentsData || assignmentsData.length === 0) return [];
+
+      // Fetch officer profiles separately
+      const officerIds = [...new Set(assignmentsData.map(a => a.officer_id))];
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('id, email, full_name')
+        .in('id', officerIds);
+
+      const profilesMap = new Map(profilesData?.map(p => [p.id, p]) || []);
+
+      return assignmentsData.map(assignment => ({
+        ...assignment,
+        officer: profilesMap.get(assignment.officer_id)
+      })) as EquipmentAssignment[];
     },
     enabled: !!user,
   });
