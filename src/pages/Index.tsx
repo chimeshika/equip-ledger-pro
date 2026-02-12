@@ -8,7 +8,9 @@ import SearchEquipment from "@/components/SearchEquipment";
 import AdminPortal from "@/components/AdminPortal";
 import UserProfile from "@/components/UserProfile";
 import Reports from "@/components/Reports";
- import { RepairWorkflow } from "@/components/repairs/RepairWorkflow";
+import { RepairWorkflow } from "@/components/repairs/RepairWorkflow";
+import BranchManagement from "@/components/admin/BranchManagement";
+import BranchAssignmentApproval from "@/components/admin/BranchAssignmentApproval";
 import { GovernmentHeader } from "@/components/GovernmentHeader";
 import { GovernmentFooter } from "@/components/GovernmentFooter";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -35,7 +37,8 @@ const Index = () => {
         return <Reports />;
        case "repairs":
          return <RepairWorkflow />;
-      case "admin":
+      case "branches":
+        return isAdmin ? <div className="space-y-6"><BranchManagement /><BranchAssignmentApproval /></div> : <Dashboard />;
         return isAdmin ? <AdminPortal /> : <Dashboard />;
       case "profile":
         return <UserProfile />;
@@ -58,7 +61,8 @@ const Index = () => {
         return "Reports";
        case "repairs":
          return "Repair Requests";
-      case "admin":
+      case "branches":
+        return "Branch Management";
         return "Admin Portal";
       case "profile":
         return "Profile";
