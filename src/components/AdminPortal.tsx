@@ -3,6 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useCurrentUser } from "@/hooks/useProfiles";
 import UserManagement from "./admin/UserManagement";
 import EquipmentManagement from "./admin/EquipmentManagement";
+import BranchManagement from "./admin/BranchManagement";
+import BranchAssignmentApproval from "./admin/BranchAssignmentApproval";
 
 const AdminPortal = () => {
   const { data: currentUser } = useCurrentUser();
@@ -25,6 +27,8 @@ const AdminPortal = () => {
 
   return (
     <div className="space-y-6">
+      <BranchManagement />
+      <BranchAssignmentApproval />
       <UserManagement />
       <EquipmentManagement />
     </div>

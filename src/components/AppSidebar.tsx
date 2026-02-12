@@ -24,7 +24,8 @@ import {
   X,
   BarChart3,
    Shield,
-   Wrench
+   Wrench,
+   Building2
 } from "lucide-react";
 
 interface AppSidebarProps {
@@ -67,6 +68,11 @@ const menuItems = [
 ];
 
 const adminItems = [
+  {
+    title: "Branches",
+    key: "branches",
+    icon: Building2,
+  },
   {
     title: "Admin Portal",
     key: "admin",
