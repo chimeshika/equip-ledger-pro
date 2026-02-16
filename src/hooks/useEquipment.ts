@@ -20,6 +20,7 @@ export interface Equipment {
   condition: string;
   notes?: string;
   created_by?: string;
+  branch_id?: string;
   created_at: string;
   updated_at: string;
 }
