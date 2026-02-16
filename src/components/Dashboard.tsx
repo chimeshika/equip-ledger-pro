@@ -1,11 +1,31 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import EquipmentCard from "./EquipmentCard";
 import { useEquipment } from "@/hooks/useEquipment";
-import { TrendingUp, TrendingDown, Package, AlertTriangle, CheckCircle, Activity } from "lucide-react";
+import { useBranches, useUserBranchAssignment } from "@/hooks/useBranches";
+import { useCurrentUser } from "@/hooks/useProfiles";
+import { TrendingUp, TrendingDown, Package, AlertTriangle, CheckCircle, Activity, Building2 } from "lucide-react";
+import { useState } from "react";
 
 const Dashboard = () => {
   const { equipment, isLoading } = useEquipment();
+  const { branches } = useBranches();
+  const { data: currentUser } = useCurrentUser();
+  const { assignment } = useUserBranchAssignment();
+  const [selectedBranchId, setSelectedBranchId] = useState<string>("all");
+
+  const isAdmin = currentUser?.role === 'admin';
+  const isItUnit = currentUser?.role === 'it_unit';
+  const canFilterBranch = isAdmin || isItUnit;
+
+  // Get user's branch name for display
+  const userBranch = branches.find(b => b.id === assignment?.branch_id);
+
+  // Filter equipment by selected branch (admins/IT) or show all (RLS handles filtering for others)
+  const filteredEquipment = canFilterBranch && selectedBranchId !== "all"
+    ? equipment.filter(eq => eq.branch_id === selectedBranchId)
+    : equipment;
 
   if (isLoading) {
     return (
@@ -20,9 +40,9 @@ const Dashboard = () => {
     );
   }
 
-  const totalEquipment = equipment.length;
-  const activeEquipment = equipment.filter(eq => eq.condition !== "Out of Service").length;
-  const warningEquipment = equipment.filter(eq => {
+  const totalEquipment = filteredEquipment.length;
+  const activeEquipment = filteredEquipment.filter(eq => eq.condition !== "Out of Service").length;
+  const warningEquipment = filteredEquipment.filter(eq => {
     if (!eq.warranty_expiry) return false;
     const expiryDate = new Date(eq.warranty_expiry);
     const now = new Date();
@@ -62,6 +82,40 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* Branch Filter / Indicator */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Building2 className="h-5 w-5" />
+          {canFilterBranch ? (
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">Branch:</span>
+              <Select value={selectedBranchId} onValueChange={setSelectedBranchId}>
+                <SelectTrigger className="w-[200px] h-9">
+                  <SelectValue placeholder="All Branches" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Branches</SelectItem>
+                  {branches.filter(b => b.is_active).map(branch => (
+                    <SelectItem key={branch.id} value={branch.id}>
+                      {branch.name} ({branch.code})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ) : (
+            <span className="text-sm font-medium">
+              {userBranch ? `${userBranch.name} (${userBranch.code})` : 'No branch assigned'}
+            </span>
+          )}
+        </div>
+        {canFilterBranch && selectedBranchId !== "all" && (
+          <Badge variant="secondary" className="text-xs">
+            Filtered
+          </Badge>
+        )}
+      </div>
+
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {stats.map((stat, index) => (
@@ -108,7 +162,7 @@ const Dashboard = () => {
           </div>
         </CardHeader>
         <CardContent className="pt-4">
-          {equipment.length === 0 ? (
+          {filteredEquipment.length === 0 ? (
             <div className="text-center py-10">
               <div className="w-14 h-14 bg-muted rounded flex items-center justify-center mx-auto mb-4">
                 <Package className="h-6 w-6 text-muted-foreground" />
@@ -123,15 +177,15 @@ const Dashboard = () => {
             </div>
           ) : (
             <div className="space-y-3">
-              {equipment.slice(0, 5).map((item, index) => (
+              {filteredEquipment.slice(0, 5).map((item, index) => (
                 <div key={item.id} className="animate-slide-up" style={{ animationDelay: `${index * 0.05}s` }}>
                   <EquipmentCard equipment={item} />
                 </div>
               ))}
-              {equipment.length > 5 && (
+              {filteredEquipment.length > 5 && (
                 <div className="text-center pt-3 border-t border-border">
                   <button className="btn-gov-outline text-sm">
-                    View All Equipment ({equipment.length - 5} more)
+                    View All Equipment ({filteredEquipment.length - 5} more)
                   </button>
                 </div>
               )}
