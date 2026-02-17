@@ -5,7 +5,8 @@ import EquipmentCard from "./EquipmentCard";
 import { useEquipment } from "@/hooks/useEquipment";
 import { useBranches, useUserBranchAssignment } from "@/hooks/useBranches";
 import { useCurrentUser } from "@/hooks/useProfiles";
-import { TrendingUp, TrendingDown, Package, AlertTriangle, CheckCircle, Activity, Building2 } from "lucide-react";
+import { useRepairRequests } from "@/hooks/useRepairRequests";
+import { TrendingUp, TrendingDown, Package, AlertTriangle, CheckCircle, Activity, Building2, Wrench, Clock, CircleCheck } from "lucide-react";
 import { useState } from "react";
 
 const Dashboard = () => {
@@ -13,6 +14,7 @@ const Dashboard = () => {
   const { branches } = useBranches();
   const { data: currentUser } = useCurrentUser();
   const { assignment } = useUserBranchAssignment();
+  const { requests: repairRequests, isLoading: repairsLoading } = useRepairRequests('all');
   const [selectedBranchId, setSelectedBranchId] = useState<string>("all");
 
   const isAdmin = currentUser?.role === 'admin';
@@ -27,7 +29,7 @@ const Dashboard = () => {
     ? equipment.filter(eq => eq.branch_id === selectedBranchId)
     : equipment;
 
-  if (isLoading) {
+  if (isLoading || repairsLoading) {
     return (
       <div className="space-y-6">
         <div className="text-center py-12">
@@ -49,6 +51,15 @@ const Dashboard = () => {
     const monthsUntilExpiry = (expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24 * 30);
     return monthsUntilExpiry <= 6 && monthsUntilExpiry > 0;
   }).length;
+
+  // Filter repair requests by branch
+  const filteredRepairs = canFilterBranch && selectedBranchId !== "all"
+    ? repairRequests.filter(r => r.branch_id === selectedBranchId)
+    : repairRequests;
+
+  const pendingRepairs = filteredRepairs.filter(r => r.status === 'pending').length;
+  const inProgressRepairs = filteredRepairs.filter(r => r.status === 'in_progress' || r.status === 'approved').length;
+  const completedRepairs = filteredRepairs.filter(r => r.status === 'completed').length;
 
   const stats = [
     {
@@ -137,6 +148,32 @@ const Dashboard = () => {
                   )}
                   <span className="font-medium">{stat.change}</span>
                 </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
+              <p className="text-white/80 text-sm">{stat.subtitle}</p>
+              <h3 className="text-white font-semibold mt-2 text-sm">{stat.title}</h3>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Repair Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {[
+          { title: "Pending Repairs", value: pendingRepairs, icon: Clock, subtitle: "Awaiting approval", bgColor: "bg-gov-warning" },
+          { title: "In Progress", value: inProgressRepairs, icon: Wrench, subtitle: "Being handled", bgColor: "bg-secondary" },
+          { title: "Completed", value: completedRepairs, icon: CircleCheck, subtitle: "Resolved", bgColor: "bg-gov-success" },
+        ].map((stat, index) => (
+          <Card
+            key={stat.title}
+            className={`${stat.bgColor} text-white border-0 shadow-gov-md animate-scale-in`}
+            style={{ animationDelay: `${(index + 3) * 0.1}s` }}
+          >
+            <CardHeader className="pb-2">
+              <div className="w-10 h-10 bg-white/20 rounded flex items-center justify-center">
+                <stat.icon className="h-5 w-5 text-white" />
               </div>
             </CardHeader>
             <CardContent className="pt-0">
