@@ -12,7 +12,9 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRepairRequests } from "@/hooks/useRepairRequests";
 import { 
   LayoutDashboard, 
   Plus, 
@@ -90,6 +92,8 @@ const userItems = [
 
 export function AppSidebar({ isAdmin, activeView, onViewChange }: AppSidebarProps) {
   const { signOut } = useAuth();
+  const { requests } = useRepairRequests('all');
+  const pendingRepairCount = requests.filter(r => r.status === 'pending').length;
 
   const handleSignOut = async () => {
     await signOut();
@@ -144,7 +148,12 @@ export function AppSidebar({ isAdmin, activeView, onViewChange }: AppSidebarProp
                       className="flex items-center gap-3 w-full text-left"
                     >
                       <item.icon className="h-4 w-4" />
-                      <span className="text-sm">{item.title}</span>
+                      <span className="text-sm flex-1">{item.title}</span>
+                      {item.key === 'repairs' && pendingRepairCount > 0 && (
+                        <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-[10px] font-bold">
+                          {pendingRepairCount}
+                        </Badge>
+                      )}
                     </button>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
