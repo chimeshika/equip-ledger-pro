@@ -9,7 +9,11 @@ import { useRepairRequests } from "@/hooks/useRepairRequests";
 import { TrendingUp, TrendingDown, Package, AlertTriangle, CheckCircle, Activity, Building2, Wrench, Clock, CircleCheck } from "lucide-react";
 import { useState } from "react";
 
-const Dashboard = () => {
+interface DashboardProps {
+  onNavigate?: (view: string) => void;
+}
+
+const Dashboard = ({ onNavigate }: DashboardProps) => {
   const { equipment, isLoading } = useEquipment();
   const { branches } = useBranches();
   const { data: currentUser } = useCurrentUser();
@@ -168,8 +172,9 @@ const Dashboard = () => {
         ].map((stat, index) => (
           <Card
             key={stat.title}
-            className={`${stat.bgColor} text-white border-0 shadow-gov-md animate-scale-in`}
+            className={`${stat.bgColor} text-white border-0 shadow-gov-md animate-scale-in cursor-pointer transition-transform hover:scale-[1.02]`}
             style={{ animationDelay: `${(index + 3) * 0.1}s` }}
+            onClick={() => onNavigate?.("repairs")}
           >
             <CardHeader className="pb-2">
               <div className="w-10 h-10 bg-white/20 rounded flex items-center justify-center">

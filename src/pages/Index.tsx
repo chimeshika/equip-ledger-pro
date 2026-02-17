@@ -26,7 +26,7 @@ const Index = () => {
   const renderActiveView = () => {
     switch (activeView) {
       case "dashboard":
-        return <Dashboard />;
+        return <Dashboard onNavigate={setActiveView} />;
       case "add-equipment":
         return <AddEquipment />;
       case "add-records":
