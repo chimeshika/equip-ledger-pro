@@ -9,26 +9,26 @@ import {
   SidebarMenuItem,
   SidebarHeader,
   SidebarFooter,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+  SidebarTrigger } from
+"@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRepairRequests } from "@/hooks/useRepairRequests";
-import { 
-  LayoutDashboard, 
-  Plus, 
-  FileText, 
-  Search, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Plus,
+  FileText,
+  Search,
+  Settings,
   User,
   LogOut,
   X,
   BarChart3,
-   Shield,
-   Wrench,
-   Building2
-} from "lucide-react";
+  Shield,
+  Wrench,
+  Building2 } from
+"lucide-react";
 
 interface AppSidebarProps {
   isAdmin: boolean;
@@ -37,63 +37,63 @@ interface AppSidebarProps {
 }
 
 const menuItems = [
-  {
-    title: "Dashboard",
-    key: "dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Add Equipment",
-    key: "add-equipment", 
-    icon: Plus,
-  },
-  {
-    title: "Add Records",
-    key: "add-records",
-    icon: FileText,
-  },
-  {
-    title: "Search",
-    key: "search",
-    icon: Search,
-  },
-  {
-    title: "Reports",
-    key: "reports",
-    icon: BarChart3,
-  },
-   {
-     title: "Repairs",
-     key: "repairs",
-     icon: Wrench,
-   },
-];
+{
+  title: "Dashboard",
+  key: "dashboard",
+  icon: LayoutDashboard
+},
+{
+  title: "Add Equipment",
+  key: "add-equipment",
+  icon: Plus
+},
+{
+  title: "Add Records",
+  key: "add-records",
+  icon: FileText
+},
+{
+  title: "Search",
+  key: "search",
+  icon: Search
+},
+{
+  title: "Reports",
+  key: "reports",
+  icon: BarChart3
+},
+{
+  title: "Repairs",
+  key: "repairs",
+  icon: Wrench
+}];
+
 
 const adminItems = [
-  {
-    title: "Branches",
-    key: "branches",
-    icon: Building2,
-  },
-  {
-    title: "Admin Portal",
-    key: "admin",
-    icon: Shield,
-  },
-];
+{
+  title: "Branches",
+  key: "branches",
+  icon: Building2
+},
+{
+  title: "Admin Portal",
+  key: "admin",
+  icon: Shield
+}];
+
 
 const userItems = [
-  {
-    title: "Profile",
-    key: "profile",
-    icon: User,
-  },
-];
+{
+  title: "Profile",
+  key: "profile",
+  icon: User
+}];
+
 
 export function AppSidebar({ isAdmin, activeView, onViewChange }: AppSidebarProps) {
   const { signOut } = useAuth();
   const { requests } = useRepairRequests('all');
-  const pendingRepairCount = requests.filter(r => r.status === 'pending').length;
+  const pendingRepairCount = requests.filter((r) => r.status === 'pending').length;
 
   const handleSignOut = async () => {
     await signOut();
@@ -129,74 +129,74 @@ export function AppSidebar({ isAdmin, activeView, onViewChange }: AppSidebarProp
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.key}>
-                  <SidebarMenuButton 
-                    asChild
-                    isActive={activeView === item.key}
-                    className={`
+              {menuItems.map((item) =>
+              <SidebarMenuItem key={item.key}>
+                  <SidebarMenuButton
+                  asChild
+                  isActive={activeView === item.key}
+                  className={`
                       transition-colors duration-150
                       rounded py-2.5 px-3
-                      ${activeView === item.key 
-                        ? 'bg-sidebar-accent text-sidebar-foreground font-medium border-l-2 border-accent' 
-                        : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
-                      }
-                    `}
-                  >
-                    <button 
-                      onClick={() => onViewChange(item.key)}
-                      className="flex items-center gap-3 w-full text-left"
-                    >
+                      ${activeView === item.key ?
+                  'bg-sidebar-accent text-sidebar-foreground font-medium border-l-2 border-accent' :
+                  'text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'}
+                    `
+                  }>
+
+                    <button
+                    onClick={() => onViewChange(item.key)}
+                    className="flex items-center gap-3 w-full text-left">
+
                       <item.icon className="h-4 w-4" />
                       <span className="text-sm flex-1">{item.title}</span>
-                      {item.key === 'repairs' && pendingRepairCount > 0 && (
-                        <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-[10px] font-bold">
+                      {item.key === 'repairs' && pendingRepairCount > 0 &&
+                    <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-[10px] font-bold">
                           {pendingRepairCount}
                         </Badge>
-                      )}
+                    }
                     </button>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              ))}
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {isAdmin && (
-          <SidebarGroup>
+        {isAdmin &&
+        <SidebarGroup>
             <SidebarGroupLabel className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider px-3 mb-2 mt-4">
               Administration
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu className="space-y-1">
-                {adminItems.map((item) => (
-                  <SidebarMenuItem key={item.key}>
-                    <SidebarMenuButton 
-                      asChild
-                      isActive={activeView === item.key}
-                      className={`
+                {adminItems.map((item) =>
+              <SidebarMenuItem key={item.key}>
+                    <SidebarMenuButton
+                  asChild
+                  isActive={activeView === item.key}
+                  className={`
                         transition-colors duration-150
                         rounded py-2.5 px-3
-                        ${activeView === item.key 
-                          ? 'bg-sidebar-accent text-sidebar-foreground font-medium border-l-2 border-accent' 
-                          : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
-                        }
-                      `}
-                    >
-                      <button 
-                        onClick={() => onViewChange(item.key)}
-                        className="flex items-center gap-3 w-full text-left"
-                      >
+                        ${activeView === item.key ?
+                  'bg-sidebar-accent text-sidebar-foreground font-medium border-l-2 border-accent' :
+                  'text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'}
+                      `
+                  }>
+
+                      <button
+                    onClick={() => onViewChange(item.key)}
+                    className="flex items-center gap-3 w-full text-left">
+
                         <item.icon className="h-4 w-4" />
                         <span className="text-sm">{item.title}</span>
                       </button>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                ))}
+              )}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
-        )}
+        }
 
         <SidebarGroup>
           <SidebarGroupLabel className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider px-3 mb-2 mt-4">
@@ -204,45 +204,45 @@ export function AppSidebar({ isAdmin, activeView, onViewChange }: AppSidebarProp
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
-              {userItems.map((item) => (
-                <SidebarMenuItem key={item.key}>
-                  <SidebarMenuButton 
-                    asChild
-                    isActive={activeView === item.key}
-                    className={`
+              {userItems.map((item) =>
+              <SidebarMenuItem key={item.key}>
+                  <SidebarMenuButton
+                  asChild
+                  isActive={activeView === item.key}
+                  className={`
                       transition-colors duration-150
                       rounded py-2.5 px-3
-                      ${activeView === item.key 
-                        ? 'bg-sidebar-accent text-sidebar-foreground font-medium border-l-2 border-accent' 
-                        : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
-                      }
-                    `}
-                  >
-                    <button 
-                      onClick={() => onViewChange(item.key)}
-                      className="flex items-center gap-3 w-full text-left"
-                    >
+                      ${activeView === item.key ?
+                  'bg-sidebar-accent text-sidebar-foreground font-medium border-l-2 border-accent' :
+                  'text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'}
+                    `
+                  }>
+
+                    <button
+                    onClick={() => onViewChange(item.key)}
+                    className="flex items-center gap-3 w-full text-left">
+
                       <item.icon className="h-4 w-4" />
                       <span className="text-sm">{item.title}</span>
                     </button>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              ))}
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border p-3 bg-sidebar">
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           onClick={handleSignOut}
-          className="w-full flex items-center gap-2 border-sidebar-border text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors py-2"
-        >
+          className="w-full flex items-center gap-2 border-sidebar-border text-sidebar-foreground/80 hover:text-sidebar-foreground transition-colors py-2 bg-secondary">
+
           <LogOut className="h-4 w-4" />
           <span className="text-sm font-medium">Sign Out</span>
         </Button>
       </SidebarFooter>
-    </Sidebar>
-  );
+    </Sidebar>);
+
 }
