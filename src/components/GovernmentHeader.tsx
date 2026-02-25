@@ -15,10 +15,10 @@ export const GovernmentHeader = ({ className = "" }: GovernmentHeaderProps) => {
             className="h-16 md:h-20 w-auto" />
 
           <div className="border-l-0 md:border-l-2 border-accent pl-0 md:pl-4">
-            <h1 className="text-lg md:text-xl font-semibold text-foreground leading-tight">                                                                                  
-  Ministry of Public Services, Provincial Councils and Local Government
+            <h1 className="text-lg font-semibold text-foreground leading-tight md:text-3xl"> Equipment Manegment System                                                                                    
+
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">                                                              Home Affairs Section  | Equipment Management System 
+            <p className="text-muted-foreground mt-1 text-base">   Home Affairs Section  | Minstry of Public Service, Provincial Councils and Local Government
 
             </p>
           </div>

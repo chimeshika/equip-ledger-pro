@@ -43,14 +43,14 @@ const Auth = () => {
         password,
         firstName,
         lastName,
-        phone,
+        phone
       });
 
       if (!validationResult.success) {
         toast({
           title: 'Validation Error',
           description: validationResult.error.errors[0].message,
-          variant: 'destructive',
+          variant: 'destructive'
         });
         setLoading(false);
         return;
@@ -63,7 +63,7 @@ const Auth = () => {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
             full_name: `${validationResult.data.firstName} ${validationResult.data.lastName}`.trim(),
-            phone: validationResult.data.phone || null,
+            phone: validationResult.data.phone || null
           }
         }
       });
@@ -72,12 +72,12 @@ const Auth = () => {
         toast({
           title: 'Sign Up Error',
           description: error.message,
-          variant: 'destructive',
+          variant: 'destructive'
         });
       } else {
         toast({
           title: 'Success',
-          description: 'Account created successfully! Please check your email to verify your account.',
+          description: 'Account created successfully! Please check your email to verify your account.'
         });
         // Clear the form
         setEmail('');
@@ -90,7 +90,7 @@ const Auth = () => {
       toast({
         title: 'Error',
         description: 'An unexpected error occurred',
-        variant: 'destructive',
+        variant: 'destructive'
       });
     } finally {
       setLoading(false);
@@ -105,14 +105,14 @@ const Auth = () => {
       // Validate input
       const validationResult = signInSchema.safeParse({
         email,
-        password,
+        password
       });
 
       if (!validationResult.success) {
         toast({
           title: 'Validation Error',
           description: validationResult.error.errors[0].message,
-          variant: 'destructive',
+          variant: 'destructive'
         });
         setLoading(false);
         return;
@@ -120,19 +120,19 @@ const Auth = () => {
 
       const { error } = await supabase.auth.signInWithPassword({
         email: validationResult.data.email,
-        password: validationResult.data.password,
+        password: validationResult.data.password
       });
 
       if (error) {
         toast({
           title: 'Sign In Error',
           description: error.message,
-          variant: 'destructive',
+          variant: 'destructive'
         });
       } else {
         toast({
           title: 'Success',
-          description: 'Signed in successfully!',
+          description: 'Signed in successfully!'
         });
         navigate('/');
       }
@@ -140,7 +140,7 @@ const Auth = () => {
       toast({
         title: 'Error',
         description: 'An unexpected error occurred',
-        variant: 'destructive',
+        variant: 'destructive'
       });
     } finally {
       setLoading(false);
@@ -154,12 +154,12 @@ const Auth = () => {
       </div>
       <GovernmentHeader />
       <div className="flex-1 flex items-center justify-center p-4 py-12">
-        <Card className="w-full max-w-md">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">
+        <Card className="w-full max-w-md bg-amber-200">
+          <CardHeader className="space-y-1 bg-primary">
+            <CardTitle className="text-2xl font-bold text-center text-primary-foreground">
               Equipment Recorder
             </CardTitle>
-            <CardDescription className="text-center">
+            <CardDescription className="text-center text-primary-foreground">
               Manage your equipment inventory
             </CardDescription>
           </CardHeader>
@@ -175,24 +175,24 @@ const Auth = () => {
                 <div className="space-y-2">
                   <Label htmlFor="signin-email">Email</Label>
                   <Input
-                    id="signin-email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+                      id="signin-email"
+                      type="email"
+                      placeholder="Enter your email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required />
+
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signin-password">Password</Label>
                   <Input
-                    id="signin-password"
-                    type="password"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
+                      id="signin-password"
+                      type="password"
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required />
+
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Signing In...' : 'Sign In'}
@@ -206,58 +206,58 @@ const Auth = () => {
                   <div className="space-y-2">
                     <Label htmlFor="signup-firstname">First Name</Label>
                     <Input
-                      id="signup-firstname"
-                      type="text"
-                      placeholder="First name"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      required
-                    />
+                        id="signup-firstname"
+                        type="text"
+                        placeholder="First name"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        required />
+
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-lastname">Last Name</Label>
                     <Input
-                      id="signup-lastname"
-                      type="text"
-                      placeholder="Last name"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      required
-                    />
+                        id="signup-lastname"
+                        type="text"
+                        placeholder="Last name"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        required />
+
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-phone">Phone Number</Label>
                   <Input
-                    id="signup-phone"
-                    type="tel"
-                    placeholder="Enter your phone number"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                  />
+                      id="signup-phone"
+                      type="tel"
+                      placeholder="Enter your phone number"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)} />
+
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-email">Email</Label>
                   <Input
-                    id="signup-email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+                      id="signup-email"
+                      type="email"
+                      placeholder="Enter your email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required />
+
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-password">Password</Label>
                   <Input
-                    id="signup-password"
-                    type="password"
-                    placeholder="Create a password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    minLength={6}
-                  />
+                      id="signup-password"
+                      type="password"
+                      placeholder="Create a password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      minLength={6} />
+
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Creating Account...' : 'Sign Up'}
@@ -269,8 +269,8 @@ const Auth = () => {
         </Card>
       </div>
       <GovernmentFooter />
-    </div>
-  );
+    </div>);
+
 };
 
 export default Auth;
