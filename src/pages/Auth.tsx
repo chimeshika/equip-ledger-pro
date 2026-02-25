@@ -163,7 +163,7 @@ const Auth = () => {
               Manage your equipment inventory
             </CardDescription>
           </CardHeader>
-        <CardContent>
+        <CardContent className="bg-primary-foreground">
           <Tabs defaultValue="signin" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
