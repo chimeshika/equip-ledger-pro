@@ -127,7 +127,7 @@ export const createNotification = async (notification: {
     }]);
 
   if (error) {
-    console.error('Error creating notification:', error);
+    if (import.meta.env.DEV) console.error('Error creating notification:', error);
     throw error;
   }
 };
