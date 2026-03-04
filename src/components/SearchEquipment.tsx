@@ -76,7 +76,7 @@ const SearchEquipment = () => {
         });
       }
     } catch (error) {
-      console.error('Error reading QR code:', error);
+      if (import.meta.env.DEV) console.error('Error reading QR code:', error);
       toast({
         title: "QR Code Error",
         description: "Unable to read QR code from the image. Please try again.",
