@@ -81,7 +81,7 @@ export const useBranches = () => {
       });
     },
     onError: (error: any) => {
-      console.error('Error adding branch:', error);
+      if (import.meta.env.DEV) console.error('Error adding branch:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to create branch. Please try again.",
