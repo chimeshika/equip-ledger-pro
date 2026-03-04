@@ -216,7 +216,7 @@ export const useUserBranchAssignment = () => {
       });
     },
     onError: (error: any) => {
-      console.error('Error requesting assignment:', error);
+      if (import.meta.env.DEV) console.error('Error requesting assignment:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to submit request. You may already have a pending request.",
