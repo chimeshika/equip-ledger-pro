@@ -171,7 +171,7 @@ const AddRecords = () => {
       scannerRef.current = scanner;
       await scanner.start();
     } catch (error) {
-      console.error('Error starting QR scanner:', error);
+      if (import.meta.env.DEV) console.error('Error starting QR scanner:', error);
       setIsScanning(false);
       toast({
         title: "Scanner Error",
