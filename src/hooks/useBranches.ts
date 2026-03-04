@@ -112,7 +112,7 @@ export const useBranches = () => {
       });
     },
     onError: (error: any) => {
-      console.error('Error updating branch:', error);
+      if (import.meta.env.DEV) console.error('Error updating branch:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to update branch. Please try again.",
