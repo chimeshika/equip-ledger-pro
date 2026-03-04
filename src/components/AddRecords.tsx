@@ -13,6 +13,7 @@ import { useRepairs } from "@/hooks/useRepairs";
 import { useProfiles } from "@/hooks/useProfiles";
 import { supabase } from "@/integrations/supabase/client";
 import QrScanner from "qr-scanner";
+import { parseQrResult } from "@/lib/qrValidation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatLKR } from "@/lib/currency";
 
