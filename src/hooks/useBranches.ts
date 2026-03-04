@@ -140,7 +140,7 @@ export const useBranches = () => {
       });
     },
     onError: (error: any) => {
-      console.error('Error deleting branch:', error);
+      if (import.meta.env.DEV) console.error('Error deleting branch:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to delete branch. Please try again.",
