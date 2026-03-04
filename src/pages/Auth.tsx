@@ -69,6 +69,7 @@ const Auth = () => {
       });
 
       if (error) {
+        console.error('Sign Up Error:', error);
         toast({
           title: 'Sign Up Error',
           description: error.message,
@@ -77,7 +78,7 @@ const Auth = () => {
       } else {
         toast({
           title: 'Success',
-          description: 'Account created successfully! Please check your email to verify your account.'
+          description: 'Account created successfully! You can now sign in.'
         });
         // Clear the form
         setEmail('');
@@ -124,9 +125,13 @@ const Auth = () => {
       });
 
       if (error) {
+        console.error('Sign In Error:', error);
+        const message = error.message === 'Email not confirmed' 
+          ? 'Your email has not been confirmed yet. Please check your inbox or contact an administrator.'
+          : error.message;
         toast({
           title: 'Sign In Error',
-          description: error.message,
+          description: message,
           variant: 'destructive'
         });
       } else {
