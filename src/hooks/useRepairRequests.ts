@@ -137,7 +137,7 @@ export const useRepairRequests = (filter?: 'my' | 'branch' | 'approved' | 'all')
       });
     },
     onError: (error: any) => {
-      console.error('Error creating repair request:', error);
+      if (import.meta.env.DEV) console.error('Error creating repair request:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to submit request.",
