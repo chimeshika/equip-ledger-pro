@@ -71,7 +71,7 @@ export const useEquipment = () => {
       });
     },
     onError: (error) => {
-      console.error('Error adding equipment:', error);
+      if (import.meta.env.DEV) console.error('Error adding equipment:', error);
       toast({
         title: "Error",
         description: "Failed to add equipment. Please try again.",
