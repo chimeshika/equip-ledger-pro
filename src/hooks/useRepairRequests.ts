@@ -74,7 +74,7 @@ export const useRepairRequests = (filter?: 'my' | 'branch' | 'approved' | 'all')
       const { data: requestsData, error } = await query;
 
       if (error) {
-        console.error('Error fetching repair requests:', error);
+        if (import.meta.env.DEV) console.error('Error fetching repair requests:', error);
         throw error;
       }
 
