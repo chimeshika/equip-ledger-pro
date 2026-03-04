@@ -313,7 +313,7 @@ export const useBranchAssignments = () => {
       });
     },
     onError: (error: any) => {
-      console.error('Error approving assignment:', error);
+      if (import.meta.env.DEV) console.error('Error approving assignment:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to approve assignment.",
