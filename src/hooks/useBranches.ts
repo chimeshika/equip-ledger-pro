@@ -253,7 +253,7 @@ export const useBranchAssignments = () => {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching branch assignments:', error);
+        if (import.meta.env.DEV) console.error('Error fetching branch assignments:', error);
         throw error;
       }
 
