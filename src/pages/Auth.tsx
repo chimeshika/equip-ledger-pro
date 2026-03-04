@@ -69,7 +69,7 @@ const Auth = () => {
       });
 
       if (error) {
-        console.error('Sign Up Error:', error);
+        if (import.meta.env.DEV) console.error('Sign Up Error:', error);
         toast({
           title: 'Sign Up Error',
           description: error.message,
