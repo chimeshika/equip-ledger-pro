@@ -202,7 +202,7 @@ export const useOfficerEquipment = (officerId?: string) => {
         .eq('is_active', true);
 
       if (error) {
-        console.error('Error fetching officer equipment:', error);
+        if (import.meta.env.DEV) console.error('Error fetching officer equipment:', error);
         throw error;
       }
 
