@@ -10,6 +10,7 @@ import { useEquipmentBySerial } from "@/hooks/useEquipment";
 import { useRepairs } from "@/hooks/useRepairs";
 import { generateEquipmentPDF } from "@/utils/pdfGenerator";
 import QrScanner from "qr-scanner";
+import { parseQrResult } from "@/lib/qrValidation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatLKR } from "@/lib/currency";
 
