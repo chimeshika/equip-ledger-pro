@@ -62,7 +62,7 @@ const EquipmentManagement = () => {
       // Refresh the equipment data
       setSelectedEquipment({ ...selectedEquipment, ...updatedData });
     } catch (error) {
-      console.error('Error updating equipment:', error);
+      if (import.meta.env.DEV) console.error('Error updating equipment:', error);
       toast({
         title: "Error",
         description: "Failed to update equipment. Please try again.",

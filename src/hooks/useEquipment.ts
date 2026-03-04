@@ -103,7 +103,7 @@ export const useEquipmentBySerial = (serialNumber: string) => {
         .maybeSingle();
 
       if (error) {
-        console.error('Error fetching equipment by serial:', error);
+        if (import.meta.env.DEV) console.error('Error fetching equipment by serial:', error);
         throw error;
       }
 

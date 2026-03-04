@@ -25,6 +25,7 @@ const EquipmentDetails = () => {
   const { repairs } = useRepairs(equipment?.id);
   const { data: currentUser } = useCurrentUser();
 
+  // UI-only check — actual authorization is enforced by RLS policies on the database
   const canEdit = equipment && currentUser && (
     currentUser.role === 'admin' || equipment.created_by === currentUser.id
   );

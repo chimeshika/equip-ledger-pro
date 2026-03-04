@@ -11,8 +11,9 @@
    const { data: currentUser } = useCurrentUser();
    const [activeTab, setActiveTab] = useState('new-request');
  
-   const isBranchHead = currentUser?.role === 'branch_head' || currentUser?.role === 'admin';
-   const isITUnit = currentUser?.role === 'it_unit' || currentUser?.role === 'admin';
+    // UI-only checks — actual authorization is enforced by RLS policies on the database
+    const isBranchHead = currentUser?.role === 'branch_head' || currentUser?.role === 'admin';
+    const isITUnit = currentUser?.role === 'it_unit' || currentUser?.role === 'admin';
  
    return (
      <div className="space-y-6">

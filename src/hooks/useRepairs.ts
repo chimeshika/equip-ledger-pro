@@ -70,7 +70,7 @@ export const useRepairs = (equipmentId?: string) => {
       });
     },
     onError: (error) => {
-      console.error('Error adding repair:', error);
+      if (import.meta.env.DEV) console.error('Error adding repair:', error);
       toast({
         title: "Error",
         description: "Failed to add repair record. Please try again.",

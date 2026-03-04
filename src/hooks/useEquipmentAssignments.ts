@@ -60,7 +60,7 @@ export const useEquipmentAssignments = (filter?: 'my' | 'branch' | 'all') => {
       const { data: assignmentsData, error } = await query;
 
       if (error) {
-        console.error('Error fetching equipment assignments:', error);
+        if (import.meta.env.DEV) console.error('Error fetching equipment assignments:', error);
         throw error;
       }
 

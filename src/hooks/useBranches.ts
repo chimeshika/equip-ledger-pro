@@ -345,7 +345,7 @@ export const useBranchAssignments = () => {
       });
     },
     onError: (error: any) => {
-      console.error('Error rejecting assignment:', error);
+      if (import.meta.env.DEV) console.error('Error rejecting assignment:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to reject assignment.",

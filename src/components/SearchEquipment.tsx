@@ -182,7 +182,7 @@ const SearchEquipment = () => {
         description: "Equipment report has been generated and downloaded",
       });
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      if (import.meta.env.DEV) console.error('Error generating PDF:', error);
       toast({
         title: "Error",
         description: "Failed to generate PDF. Please try again.",

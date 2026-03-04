@@ -21,6 +21,7 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
   const { requests: repairRequests, isLoading: repairsLoading } = useRepairRequests('all');
   const [selectedBranchId, setSelectedBranchId] = useState<string>("all");
 
+  // UI-only checks — actual authorization is enforced by RLS policies on the database
   const isAdmin = currentUser?.role === 'admin';
   const isItUnit = currentUser?.role === 'it_unit';
   const canFilterBranch = isAdmin || isItUnit;

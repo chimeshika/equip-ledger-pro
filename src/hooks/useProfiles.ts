@@ -95,7 +95,7 @@ export const useProfiles = () => {
       });
     },
     onError: (error) => {
-      console.error('Error updating role:', error);
+      if (import.meta.env.DEV) console.error('Error updating role:', error);
       toast({
         title: "Error",
         description: "Failed to update user role. Please try again.",

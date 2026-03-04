@@ -248,7 +248,7 @@ export const useRepairRequests = (filter?: 'my' | 'branch' | 'approved' | 'all')
       });
     },
     onError: (error: any) => {
-      console.error('Error updating job status:', error);
+      if (import.meta.env.DEV) console.error('Error updating job status:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to update job status.",

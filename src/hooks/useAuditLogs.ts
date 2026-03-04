@@ -86,7 +86,7 @@ export const useEquipmentAuditHistory = (equipmentId?: string) => {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching equipment audit history:', error);
+        if (import.meta.env.DEV) console.error('Error fetching equipment audit history:', error);
         throw error;
       }
 
