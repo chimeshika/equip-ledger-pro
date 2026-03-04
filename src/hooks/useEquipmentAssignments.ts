@@ -133,7 +133,7 @@ export const useEquipmentAssignments = (filter?: 'my' | 'branch' | 'all') => {
       });
     },
     onError: (error: any) => {
-      console.error('Error assigning equipment:', error);
+      if (import.meta.env.DEV) console.error('Error assigning equipment:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to assign equipment.",
