@@ -20,6 +20,7 @@ import { Menu, Zap } from "lucide-react";
 
 const Index = () => {
   const { data: currentUser } = useCurrentUser();
+  // UI-only check — actual authorization is enforced by RLS policies on the database
   const isAdmin = currentUser?.role === 'admin';
   const [activeView, setActiveView] = useState("dashboard");
 

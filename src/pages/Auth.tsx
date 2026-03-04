@@ -69,7 +69,7 @@ const Auth = () => {
       });
 
       if (error) {
-        console.error('Sign Up Error:', error);
+        if (import.meta.env.DEV) console.error('Sign Up Error:', error);
         toast({
           title: 'Sign Up Error',
           description: error.message,
@@ -125,7 +125,7 @@ const Auth = () => {
       });
 
       if (error) {
-        console.error('Sign In Error:', error);
+        if (import.meta.env.DEV) console.error('Sign In Error:', error);
         const message = error.message === 'Email not confirmed' 
           ? 'Your email has not been confirmed yet. Please check your inbox or contact an administrator.'
           : error.message;

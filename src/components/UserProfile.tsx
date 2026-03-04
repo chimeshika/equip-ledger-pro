@@ -77,7 +77,7 @@ const UserProfile = () => {
         await refetch();
       }, 500);
     } catch (error) {
-      console.error('Error updating profile:', error);
+      if (import.meta.env.DEV) console.error('Error updating profile:', error);
       toast({
         title: "Error",
         description: "Failed to update profile. Please try again.",
@@ -100,7 +100,7 @@ const UserProfile = () => {
         await refetch();
       }, 500);
     } catch (error) {
-      console.error('Error creating profile:', error);
+      if (import.meta.env.DEV) console.error('Error creating profile:', error);
       toast({
         title: "Error",
         description: "Failed to create profile. Please try again.",

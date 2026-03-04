@@ -74,7 +74,7 @@ export const useRepairRequests = (filter?: 'my' | 'branch' | 'approved' | 'all')
       const { data: requestsData, error } = await query;
 
       if (error) {
-        console.error('Error fetching repair requests:', error);
+        if (import.meta.env.DEV) console.error('Error fetching repair requests:', error);
         throw error;
       }
 
@@ -137,7 +137,7 @@ export const useRepairRequests = (filter?: 'my' | 'branch' | 'approved' | 'all')
       });
     },
     onError: (error: any) => {
-      console.error('Error creating repair request:', error);
+      if (import.meta.env.DEV) console.error('Error creating repair request:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to submit request.",
@@ -185,7 +185,7 @@ export const useRepairRequests = (filter?: 'my' | 'branch' | 'approved' | 'all')
       });
     },
     onError: (error: any) => {
-      console.error('Error processing decision:', error);
+      if (import.meta.env.DEV) console.error('Error processing decision:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to process decision.",
@@ -248,7 +248,7 @@ export const useRepairRequests = (filter?: 'my' | 'branch' | 'approved' | 'all')
       });
     },
     onError: (error: any) => {
-      console.error('Error updating job status:', error);
+      if (import.meta.env.DEV) console.error('Error updating job status:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to update job status.",

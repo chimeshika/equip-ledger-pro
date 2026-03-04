@@ -125,7 +125,7 @@ const AddEquipment = () => {
       setAddedEquipmentData(equipmentData);
       setShowQRDialog(true);
     } catch (error) {
-      console.error('Error generating QR code:', error);
+      if (import.meta.env.DEV) console.error('Error generating QR code:', error);
       toast({
         title: "QR Code Error",
         description: "Failed to generate QR code, but equipment was added successfully.",

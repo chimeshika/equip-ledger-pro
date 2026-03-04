@@ -60,7 +60,7 @@ export const useEquipmentAssignments = (filter?: 'my' | 'branch' | 'all') => {
       const { data: assignmentsData, error } = await query;
 
       if (error) {
-        console.error('Error fetching equipment assignments:', error);
+        if (import.meta.env.DEV) console.error('Error fetching equipment assignments:', error);
         throw error;
       }
 
@@ -133,7 +133,7 @@ export const useEquipmentAssignments = (filter?: 'my' | 'branch' | 'all') => {
       });
     },
     onError: (error: any) => {
-      console.error('Error assigning equipment:', error);
+      if (import.meta.env.DEV) console.error('Error assigning equipment:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to assign equipment.",
@@ -164,7 +164,7 @@ export const useEquipmentAssignments = (filter?: 'my' | 'branch' | 'all') => {
       });
     },
     onError: (error: any) => {
-      console.error('Error unassigning equipment:', error);
+      if (import.meta.env.DEV) console.error('Error unassigning equipment:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to unassign equipment.",
@@ -202,7 +202,7 @@ export const useOfficerEquipment = (officerId?: string) => {
         .eq('is_active', true);
 
       if (error) {
-        console.error('Error fetching officer equipment:', error);
+        if (import.meta.env.DEV) console.error('Error fetching officer equipment:', error);
         throw error;
       }
 

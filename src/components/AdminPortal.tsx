@@ -9,7 +9,7 @@ import BranchAssignmentApproval from "./admin/BranchAssignmentApproval";
 const AdminPortal = () => {
   const { data: currentUser } = useCurrentUser();
 
-  // Check if current user is admin
+  // UI-only check — actual authorization is enforced by RLS policies on the database
   const isAdmin = currentUser?.role === 'admin';
 
   if (!isAdmin) {

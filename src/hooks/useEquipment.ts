@@ -41,7 +41,7 @@ export const useEquipment = () => {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching equipment:', error);
+        if (import.meta.env.DEV) console.error('Error fetching equipment:', error);
         throw error;
       }
 
@@ -71,7 +71,7 @@ export const useEquipment = () => {
       });
     },
     onError: (error) => {
-      console.error('Error adding equipment:', error);
+      if (import.meta.env.DEV) console.error('Error adding equipment:', error);
       toast({
         title: "Error",
         description: "Failed to add equipment. Please try again.",
@@ -103,7 +103,7 @@ export const useEquipmentBySerial = (serialNumber: string) => {
         .maybeSingle();
 
       if (error) {
-        console.error('Error fetching equipment by serial:', error);
+        if (import.meta.env.DEV) console.error('Error fetching equipment by serial:', error);
         throw error;
       }
 

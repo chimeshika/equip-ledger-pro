@@ -32,7 +32,7 @@ export const useNotifications = () => {
         .limit(50);
 
       if (error) {
-        console.error('Error fetching notifications:', error);
+        if (import.meta.env.DEV) console.error('Error fetching notifications:', error);
         throw error;
       }
 
@@ -127,7 +127,7 @@ export const createNotification = async (notification: {
     }]);
 
   if (error) {
-    console.error('Error creating notification:', error);
+    if (import.meta.env.DEV) console.error('Error creating notification:', error);
     throw error;
   }
 };

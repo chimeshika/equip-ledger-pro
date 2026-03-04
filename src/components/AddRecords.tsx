@@ -13,6 +13,7 @@ import { useRepairs } from "@/hooks/useRepairs";
 import { useProfiles } from "@/hooks/useProfiles";
 import { supabase } from "@/integrations/supabase/client";
 import QrScanner from "qr-scanner";
+import { parseQrResult } from "@/lib/qrValidation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatLKR } from "@/lib/currency";
 
@@ -82,31 +83,27 @@ const AddRecords = () => {
       const result = await QrScanner.scanImage(file);
       
       try {
-        // Parse QR code data - it should contain equipment info
-        const data = JSON.parse(result);
-        if (data.serial_number) {
-          setActiveSearchSerial(data.serial_number);
-          setSearchSerial(data.serial_number);
+        const serial = parseQrResult(result);
+        if (serial) {
+          setActiveSearchSerial(serial);
+          setSearchSerial(serial);
           setShowScannerOptions(false);
           toast({
             title: "QR Code Read Successfully",
-            description: `Found equipment: ${data.serial_number}`,
+            description: `Found equipment: ${serial}`,
           });
         } else {
           throw new Error("Invalid QR code format");
         }
       } catch (error) {
-        // If parsing fails, treat as plain text serial number
-        setActiveSearchSerial(result);
-        setSearchSerial(result);
-        setShowScannerOptions(false);
         toast({
-          title: "QR Code Read Successfully",
-          description: `Searching for: ${result}`,
+          title: "QR Code Error",
+          description: "Could not extract a valid serial number from this QR code.",
+          variant: "destructive"
         });
       }
     } catch (error) {
-      console.error('Error reading QR code:', error);
+      if (import.meta.env.DEV) console.error('Error reading QR code:', error);
       toast({
         title: "QR Code Error",
         description: "Unable to read QR code from the image. Please try again.",
@@ -137,28 +134,20 @@ const AddRecords = () => {
       const scanner = new QrScanner(
         videoRef.current,
         (result) => {
-          try {
-            // Parse QR code data - it should contain equipment info
-            const data = JSON.parse(result.data);
-            if (data.serial_number) {
-              setActiveSearchSerial(data.serial_number);
-              setSearchSerial(data.serial_number);
-              closeScannerOptions();
-              toast({
-                title: "QR Code Scanned",
-                description: `Found equipment: ${data.serial_number}`,
-              });
-            } else {
-              throw new Error("Invalid QR code format");
-            }
-          } catch (error) {
-            // If parsing fails, treat as plain text serial number
-            setActiveSearchSerial(result.data);
-            setSearchSerial(result.data);
+          const serial = parseQrResult(result.data);
+          if (serial) {
+            setActiveSearchSerial(serial);
+            setSearchSerial(serial);
             closeScannerOptions();
             toast({
               title: "QR Code Scanned",
-              description: `Searching for: ${result.data}`,
+              description: `Found equipment: ${serial}`,
+            });
+          } else {
+            toast({
+              title: "QR Code Error",
+              description: "Could not extract a valid serial number.",
+              variant: "destructive"
             });
           }
         },
@@ -171,7 +160,7 @@ const AddRecords = () => {
       scannerRef.current = scanner;
       await scanner.start();
     } catch (error) {
-      console.error('Error starting QR scanner:', error);
+      if (import.meta.env.DEV) console.error('Error starting QR scanner:', error);
       setIsScanning(false);
       toast({
         title: "Scanner Error",
@@ -293,7 +282,7 @@ const AddRecords = () => {
       setUpdateDocument(null);
 
     } catch (error) {
-      console.error('Error updating equipment:', error);
+      if (import.meta.env.DEV) console.error('Error updating equipment:', error);
       toast({
         title: "Error",
         description: "Failed to update equipment. Please try again.",

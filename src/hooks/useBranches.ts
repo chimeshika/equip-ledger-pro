@@ -51,7 +51,7 @@ export const useBranches = () => {
         .order('name', { ascending: true });
 
       if (error) {
-        console.error('Error fetching branches:', error);
+        if (import.meta.env.DEV) console.error('Error fetching branches:', error);
         throw error;
       }
 
@@ -81,7 +81,7 @@ export const useBranches = () => {
       });
     },
     onError: (error: any) => {
-      console.error('Error adding branch:', error);
+      if (import.meta.env.DEV) console.error('Error adding branch:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to create branch. Please try again.",
@@ -112,7 +112,7 @@ export const useBranches = () => {
       });
     },
     onError: (error: any) => {
-      console.error('Error updating branch:', error);
+      if (import.meta.env.DEV) console.error('Error updating branch:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to update branch. Please try again.",
@@ -140,7 +140,7 @@ export const useBranches = () => {
       });
     },
     onError: (error: any) => {
-      console.error('Error deleting branch:', error);
+      if (import.meta.env.DEV) console.error('Error deleting branch:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to delete branch. Please try again.",
@@ -181,7 +181,7 @@ export const useUserBranchAssignment = () => {
         .maybeSingle();
 
       if (error) {
-        console.error('Error fetching user branch assignment:', error);
+        if (import.meta.env.DEV) console.error('Error fetching user branch assignment:', error);
         throw error;
       }
 
@@ -216,7 +216,7 @@ export const useUserBranchAssignment = () => {
       });
     },
     onError: (error: any) => {
-      console.error('Error requesting assignment:', error);
+      if (import.meta.env.DEV) console.error('Error requesting assignment:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to submit request. You may already have a pending request.",
@@ -253,7 +253,7 @@ export const useBranchAssignments = () => {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching branch assignments:', error);
+        if (import.meta.env.DEV) console.error('Error fetching branch assignments:', error);
         throw error;
       }
 
@@ -313,7 +313,7 @@ export const useBranchAssignments = () => {
       });
     },
     onError: (error: any) => {
-      console.error('Error approving assignment:', error);
+      if (import.meta.env.DEV) console.error('Error approving assignment:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to approve assignment.",
@@ -345,7 +345,7 @@ export const useBranchAssignments = () => {
       });
     },
     onError: (error: any) => {
-      console.error('Error rejecting assignment:', error);
+      if (import.meta.env.DEV) console.error('Error rejecting assignment:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to reject assignment.",

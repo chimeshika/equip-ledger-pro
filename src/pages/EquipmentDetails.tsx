@@ -25,6 +25,7 @@ const EquipmentDetails = () => {
   const { repairs } = useRepairs(equipment?.id);
   const { data: currentUser } = useCurrentUser();
 
+  // UI-only check — actual authorization is enforced by RLS policies on the database
   const canEdit = equipment && currentUser && (
     currentUser.role === 'admin' || equipment.created_by === currentUser.id
   );
@@ -48,7 +49,7 @@ const EquipmentDetails = () => {
       setIsEditing(false);
       refetch();
     } catch (error) {
-      console.error('Error updating equipment:', error);
+      if (import.meta.env.DEV) console.error('Error updating equipment:', error);
       toast({
         title: "Error",
         description: "Failed to update equipment. Please try again.",
@@ -67,7 +68,7 @@ const EquipmentDetails = () => {
         description: "Equipment report has been generated and downloaded",
       });
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      if (import.meta.env.DEV) console.error('Error generating PDF:', error);
       toast({
         title: "Error",
         description: "Failed to generate PDF. Please try again.",
