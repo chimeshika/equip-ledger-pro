@@ -51,7 +51,7 @@ export const useBranches = () => {
         .order('name', { ascending: true });
 
       if (error) {
-        console.error('Error fetching branches:', error);
+        if (import.meta.env.DEV) console.error('Error fetching branches:', error);
         throw error;
       }
 
