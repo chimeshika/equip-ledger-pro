@@ -35,7 +35,7 @@ const EquipmentManagement = () => {
       
       setSelectedEquipment(null);
     } catch (error) {
-      console.error('Error deleting equipment:', error);
+      if (import.meta.env.DEV) console.error('Error deleting equipment:', error);
       toast({
         title: "Error",
         description: "Failed to delete equipment. Please try again.",
