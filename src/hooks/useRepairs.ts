@@ -34,7 +34,7 @@ export const useRepairs = (equipmentId?: string) => {
         .order('repair_date', { ascending: false });
 
       if (error) {
-        console.error('Error fetching repairs:', error);
+        if (import.meta.env.DEV) console.error('Error fetching repairs:', error);
         throw error;
       }
 
