@@ -83,27 +83,23 @@ const AddRecords = () => {
       const result = await QrScanner.scanImage(file);
       
       try {
-        // Parse QR code data - it should contain equipment info
-        const data = JSON.parse(result);
-        if (data.serial_number) {
-          setActiveSearchSerial(data.serial_number);
-          setSearchSerial(data.serial_number);
+        const serial = parseQrResult(result);
+        if (serial) {
+          setActiveSearchSerial(serial);
+          setSearchSerial(serial);
           setShowScannerOptions(false);
           toast({
             title: "QR Code Read Successfully",
-            description: `Found equipment: ${data.serial_number}`,
+            description: `Found equipment: ${serial}`,
           });
         } else {
           throw new Error("Invalid QR code format");
         }
       } catch (error) {
-        // If parsing fails, treat as plain text serial number
-        setActiveSearchSerial(result);
-        setSearchSerial(result);
-        setShowScannerOptions(false);
         toast({
-          title: "QR Code Read Successfully",
-          description: `Searching for: ${result}`,
+          title: "QR Code Error",
+          description: "Could not extract a valid serial number from this QR code.",
+          variant: "destructive"
         });
       }
     } catch (error) {
