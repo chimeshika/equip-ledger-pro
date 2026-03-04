@@ -181,7 +181,7 @@ export const useUserBranchAssignment = () => {
         .maybeSingle();
 
       if (error) {
-        console.error('Error fetching user branch assignment:', error);
+        if (import.meta.env.DEV) console.error('Error fetching user branch assignment:', error);
         throw error;
       }
 
