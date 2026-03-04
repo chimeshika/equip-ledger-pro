@@ -54,7 +54,7 @@ export const useAuditLogs = (filter?: {
       const { data, error } = await query;
 
       if (error) {
-        console.error('Error fetching audit logs:', error);
+        if (import.meta.env.DEV) console.error('Error fetching audit logs:', error);
         throw error;
       }
 
