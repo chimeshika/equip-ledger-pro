@@ -1,0 +1,17 @@
+
+-- Drop all existing RESTRICTIVE policies on user_roles
+DROP POLICY IF EXISTS "Users can view their own role" ON public.user_roles;
+DROP POLICY IF EXISTS "Admins can view all roles" ON public.user_roles;
+DROP POLICY IF EXISTS "Admins can manage roles" ON public.user_roles;
+
+-- Recreate as PERMISSIVE policies
+CREATE POLICY "Users can view their own role" ON public.user_roles
+  FOR SELECT TO authenticated USING (user_id = auth.uid());
+
+CREATE POLICY "Admins can view all roles" ON public.user_roles
+  FOR SELECT TO authenticated USING (has_role(auth.uid(), 'admin'));
+
+CREATE POLICY "Admins can manage roles" ON public.user_roles
+  FOR ALL TO authenticated
+  USING (has_role(auth.uid(), 'admin'))
+  WITH CHECK (has_role(auth.uid(), 'admin'));
