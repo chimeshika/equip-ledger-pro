@@ -75,6 +75,7 @@ const Index = () => {
          return "Repair Requests";
       case "branches":
         return "Branch Management";
+      case "admin":
         return "Admin Portal";
       case "profile":
         return "Profile";
