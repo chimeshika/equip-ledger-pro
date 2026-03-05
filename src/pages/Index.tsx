@@ -49,8 +49,9 @@ const Index = () => {
        case "repairs":
          return <RepairWorkflow />;
       case "branches":
-        return isAdmin ? <div className="space-y-6"><BranchManagement /><BranchAssignmentApproval /></div> : <Dashboard />;
-        return isAdmin ? <AdminPortal /> : <Dashboard />;
+        return isAdmin ? <div className="space-y-6"><BranchManagement /><BranchAssignmentApproval /></div> : <Dashboard onNavigate={setActiveView} />;
+      case "admin":
+        return isAdmin ? <AdminPortal /> : <Dashboard onNavigate={setActiveView} />;
       case "profile":
         return <UserProfile />;
       default:
