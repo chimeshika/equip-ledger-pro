@@ -14,14 +14,24 @@ import BranchAssignmentApproval from "@/components/admin/BranchAssignmentApprova
 import { GovernmentHeader } from "@/components/GovernmentHeader";
 import { GovernmentFooter } from "@/components/GovernmentFooter";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useCurrentUser } from "@/hooks/useProfiles";
 import { useState } from "react";
 import { Menu, Zap } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 const Index = () => {
-  const { data: currentUser } = useCurrentUser();
+  const { user } = useAuth();
   // UI-only check — actual authorization is enforced by RLS policies on the database
-  const isAdmin = currentUser?.role === 'admin';
+  const { data: isAdmin } = useQuery({
+    queryKey: ['isAdmin', user?.id],
+    queryFn: async () => {
+      if (!user) return false;
+      const { data } = await supabase.rpc('has_role', { _user_id: user.id, _role: 'admin' });
+      return !!data;
+    },
+    enabled: !!user,
+  });
   const [activeView, setActiveView] = useState("dashboard");
 
   const renderActiveView = () => {
