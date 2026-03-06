@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { UserCheck, Check, X, Clock, Building2 } from "lucide-react";
+import { UserCheck, Check, X, Clock, Building2, Trash2 } from "lucide-react";
 import { useBranchAssignments } from "@/hooks/useBranches";
 import type { Database } from "@/integrations/supabase/types";
 
