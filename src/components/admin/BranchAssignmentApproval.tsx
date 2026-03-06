@@ -57,12 +57,24 @@ const BranchAssignmentApproval = () => {
                     {assignment.profile?.full_name || assignment.profile?.email || "Unknown User"}
                   </p>
                   <p className="text-sm text-muted-foreground">{assignment.profile?.email}</p>
-                  <div className="flex items-center gap-3 mt-1">
+                  <div className="flex flex-wrap items-center gap-3 mt-1">
                     <span className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Building2 className="h-3 w-3" />
                       {assignment.branch?.name || "Unknown Branch"}
                     </span>
                     <Badge variant="outline" className="text-xs">{roleLabels[assignment.requested_role]}</Badge>
+                  </div>
+                  {/* New fields */}
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs text-muted-foreground">
+                    {assignment.designation && (
+                      <span><span className="font-medium text-foreground">Designation:</span> {assignment.designation}</span>
+                    )}
+                    {assignment.post_order && (
+                      <span><span className="font-medium text-foreground">Post Order:</span> {assignment.post_order}</span>
+                    )}
+                    {assignment.supervisor && (
+                      <span><span className="font-medium text-foreground">Supervisor:</span> {assignment.supervisor.full_name || 'N/A'}</span>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -101,12 +113,23 @@ const BranchAssignmentApproval = () => {
                   <p className="font-medium text-foreground">
                     {assignment.profile?.full_name || assignment.profile?.email || "Unknown User"}
                   </p>
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                  <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Building2 className="h-3 w-3" />
                       {assignment.branch?.name || "Unknown Branch"}
                     </span>
                     <Badge variant="outline" className="text-xs">{roleLabels[assignment.requested_role]}</Badge>
+                  </div>
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs text-muted-foreground">
+                    {assignment.designation && (
+                      <span><span className="font-medium text-foreground">Designation:</span> {assignment.designation}</span>
+                    )}
+                    {assignment.post_order && (
+                      <span><span className="font-medium text-foreground">Post Order:</span> {assignment.post_order}</span>
+                    )}
+                    {assignment.supervisor && (
+                      <span><span className="font-medium text-foreground">Supervisor:</span> {assignment.supervisor.full_name || 'N/A'}</span>
+                    )}
                   </div>
                 </div>
                 <span className={statusStyles[assignment.status] || "badge-gov-info"}>
