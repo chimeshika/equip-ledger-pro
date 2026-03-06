@@ -304,3 +304,4 @@ export const useBranchAssignments = () => {
     rejectAssignment: rejectAssignmentMutation.mutate, isRejecting: rejectAssignmentMutation.isPending,
     deleteAssignment: deleteAssignmentMutation.mutate, isDeleting: deleteAssignmentMutation.isPending,
   };
+};
