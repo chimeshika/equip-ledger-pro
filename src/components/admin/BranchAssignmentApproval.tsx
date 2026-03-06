@@ -22,7 +22,7 @@ const statusStyles: Record<string, string> = {
 };
 
 const BranchAssignmentApproval = () => {
-  const { assignments, isLoading, approveAssignment, isApproving, rejectAssignment, isRejecting } = useBranchAssignments();
+  const { assignments, isLoading, approveAssignment, isApproving, rejectAssignment, isRejecting, deleteAssignment, isDeleting } = useBranchAssignments();
 
   const pending = assignments.filter(a => a.status === "pending");
   const processed = assignments.filter(a => a.status !== "pending");
