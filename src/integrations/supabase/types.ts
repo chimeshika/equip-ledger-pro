@@ -467,9 +467,12 @@ export type Database = {
           approved_by: string | null
           branch_id: string
           created_at: string
+          designation: string | null
           id: string
+          post_order: number | null
           requested_role: Database["public"]["Enums"]["app_role"]
           status: string
+          supervisor_id: string | null
           updated_at: string
           user_id: string
         }
@@ -478,9 +481,12 @@ export type Database = {
           approved_by?: string | null
           branch_id: string
           created_at?: string
+          designation?: string | null
           id?: string
+          post_order?: number | null
           requested_role?: Database["public"]["Enums"]["app_role"]
           status?: string
+          supervisor_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -489,9 +495,12 @@ export type Database = {
           approved_by?: string | null
           branch_id?: string
           created_at?: string
+          designation?: string | null
           id?: string
+          post_order?: number | null
           requested_role?: Database["public"]["Enums"]["app_role"]
           status?: string
+          supervisor_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -501,6 +510,13 @@ export type Database = {
             columns: ["branch_id"]
             isOneToOne: false
             referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_branch_assignments_supervisor_id_fkey"
+            columns: ["supervisor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
