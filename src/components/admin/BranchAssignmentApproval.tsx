@@ -132,9 +132,20 @@ const BranchAssignmentApproval = () => {
                     )}
                   </div>
                 </div>
-                <span className={statusStyles[assignment.status] || "badge-gov-info"}>
-                  {assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1)}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={statusStyles[assignment.status] || "badge-gov-info"}>
+                    {assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1)}
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-destructive hover:bg-destructive/10"
+                    onClick={() => deleteAssignment({ assignmentId: assignment.id, userId: assignment.user_id })}
+                    disabled={isDeleting}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
