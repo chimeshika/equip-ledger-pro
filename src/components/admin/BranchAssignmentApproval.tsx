@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { UserCheck, Check, X, Clock, Building2 } from "lucide-react";
+import { UserCheck, Check, X, Clock, Building2, Trash2 } from "lucide-react";
 import { useBranchAssignments } from "@/hooks/useBranches";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -22,7 +22,7 @@ const statusStyles: Record<string, string> = {
 };
 
 const BranchAssignmentApproval = () => {
-  const { assignments, isLoading, approveAssignment, isApproving, rejectAssignment, isRejecting } = useBranchAssignments();
+  const { assignments, isLoading, approveAssignment, isApproving, rejectAssignment, isRejecting, deleteAssignment, isDeleting } = useBranchAssignments();
 
   const pending = assignments.filter(a => a.status === "pending");
   const processed = assignments.filter(a => a.status !== "pending");
@@ -132,9 +132,20 @@ const BranchAssignmentApproval = () => {
                     )}
                   </div>
                 </div>
-                <span className={statusStyles[assignment.status] || "badge-gov-info"}>
-                  {assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1)}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={statusStyles[assignment.status] || "badge-gov-info"}>
+                    {assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1)}
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-destructive hover:bg-destructive/10"
+                    onClick={() => deleteAssignment({ assignmentId: assignment.id, userId: assignment.user_id })}
+                    disabled={isDeleting}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>

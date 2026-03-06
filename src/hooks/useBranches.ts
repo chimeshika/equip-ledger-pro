@@ -275,9 +275,33 @@ export const useBranchAssignments = () => {
     },
   });
 
+  const deleteAssignmentMutation = useMutation({
+    mutationFn: async ({ assignmentId, userId }: { assignmentId: string; userId: string }) => {
+      if (!user) throw new Error('User not authenticated');
+      const { error } = await supabase
+        .from('user_branch_assignments')
+        .delete()
+        .eq('id', assignmentId);
+      if (error) throw error;
+      // Also clean up the user's role back to default 'user'
+      await supabase.from('user_roles').delete().eq('user_id', userId);
+      await supabase.from('user_roles').insert({ user_id: userId, role: 'user' as AppRole });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['branchAssignments'] });
+      queryClient.invalidateQueries({ queryKey: ['profiles'] });
+      toast({ title: "Assignment Deleted", description: "User assignment has been removed." });
+    },
+    onError: (error: any) => {
+      if (import.meta.env.DEV) console.error('Error deleting assignment:', error);
+      toast({ title: "Error", description: error.message || "Failed to delete assignment.", variant: "destructive" });
+    },
+  });
+
   return {
     assignments, isLoading,
     approveAssignment: approveAssignmentMutation.mutate, isApproving: approveAssignmentMutation.isPending,
     rejectAssignment: rejectAssignmentMutation.mutate, isRejecting: rejectAssignmentMutation.isPending,
+    deleteAssignment: deleteAssignmentMutation.mutate, isDeleting: deleteAssignmentMutation.isPending,
   };
 };
