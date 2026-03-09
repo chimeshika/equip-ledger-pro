@@ -54,7 +54,7 @@ const BranchAssignmentApproval = () => {
                       <Building2 className="h-3 w-3" />
                       {assignment.branch?.name || "Unknown Branch"}
                     </span>
-                    <Badge variant="outline" className="text-xs">{roleLabels[assignment.requested_role]}</Badge>
+                    <Badge variant="outline" className="text-xs">{ROLE_LABELS[assignment.requested_role]}</Badge>
                   </div>
                   {/* New fields */}
                   <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs text-muted-foreground">
