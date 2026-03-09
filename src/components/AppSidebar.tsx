@@ -163,7 +163,7 @@ export function AppSidebar({ isAdmin, isBranchHead, activeView, onViewChange }: 
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {isAdmin &&
+        {(isAdmin || isBranchHead) &&
         <SidebarGroup>
             <SidebarGroupLabel className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider px-3 mb-2 mt-4">
               Administration
