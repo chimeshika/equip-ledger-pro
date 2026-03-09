@@ -8,6 +8,7 @@ import { useRepairRequests } from "@/hooks/useRepairRequests";
 import { BranchFilter } from "./BranchFilter";
 import { hasGlobalAccess } from "@/lib/roles";
 import { TrendingUp, TrendingDown, Package, AlertTriangle, CheckCircle, Activity, Wrench, Clock, CircleCheck } from "lucide-react";
+import { useState } from "react";
 
 interface DashboardProps {
   onNavigate?: (view: string) => void;
