@@ -99,7 +99,8 @@ const Index = () => {
         <GovernmentHeader />
         <div className="flex flex-1 gradient-primary">
           <AppSidebar 
-            isAdmin={isAdmin} 
+            isAdmin={!!isAdmin} 
+            isBranchHead={!!isBranchHead}
             activeView={activeView} 
             onViewChange={setActiveView} 
           />
