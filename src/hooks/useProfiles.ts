@@ -15,7 +15,8 @@ export interface Profile {
   updated_at: string;
 }
 
-export type AppRole = 'admin' | 'user' | 'branch_head' | 'it_unit' | 'officer';
+export type { AppRole } from '@/lib/roles';
+import type { AppRole } from '@/lib/roles';
 
 export interface UserRole {
   id: string;

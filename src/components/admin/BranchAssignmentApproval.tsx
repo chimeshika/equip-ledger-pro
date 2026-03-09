@@ -5,15 +5,7 @@ import { UserCheck, Check, X, Clock, Building2, Trash2 } from "lucide-react";
 import { useBranchAssignments } from "@/hooks/useBranches";
 import type { Database } from "@/integrations/supabase/types";
 
-type AppRole = Database['public']['Enums']['app_role'];
-
-const roleLabels: Record<AppRole, string> = {
-  admin: "Administrator",
-  user: "User",
-  branch_head: "Branch Head",
-  it_unit: "IT Unit",
-  officer: "Officer",
-};
+import { ROLE_LABELS } from "@/lib/roles";
 
 const statusStyles: Record<string, string> = {
   pending: "badge-gov-warning",
