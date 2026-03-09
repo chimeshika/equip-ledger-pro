@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,66 +9,123 @@ import { Switch } from "@/components/ui/switch";
 import { Building2, Plus, Pencil, Trash2, Phone, MapPin } from "lucide-react";
 import { useBranches, type Branch } from "@/hooks/useBranches";
 
+interface BranchFormData {
+  name: string;
+  code: string;
+  address: string;
+  phone: string;
+  is_active: boolean;
+}
+
+interface BranchFormProps {
+  formData: BranchFormData;
+  setFormData: React.Dispatch<React.SetStateAction<BranchFormData>>;
+  onSubmit: () => void;
+  isSubmitting: boolean;
+  submitLabel: string;
+}
+
+/**
+ * Extracted as a stable, memoized component so it does NOT remount
+ * on every parent re-render. This keeps the input DOM nodes alive,
+ * preserving cursor position and avoiding the "jumpy input" bug.
+ *
+ * State is lifted to the parent and passed via props — the component
+ * itself is a controlled form with no formatting on keystroke.
+ * Any trimming / uppercasing should happen in the onSubmit handler.
+ */
+const BranchForm = memo(({ formData, setFormData, onSubmit, isSubmitting, submitLabel }: BranchFormProps) => (
+  <div className="space-y-4">
+    <div className="grid grid-cols-2 gap-4">
+      <div className="space-y-2">
+        <Label htmlFor="branch-name">Branch Name *</Label>
+        <Input
+          id="branch-name"
+          value={formData.name}
+          onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
+          placeholder="e.g. Head Office"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="branch-code">Branch Code *</Label>
+        <Input
+          id="branch-code"
+          value={formData.code}
+          onChange={(e) => setFormData(p => ({ ...p, code: e.target.value }))}
+          placeholder="e.g. HQ"
+        />
+      </div>
+    </div>
+    <div className="space-y-2">
+      <Label htmlFor="branch-address">Address</Label>
+      <Input
+        id="branch-address"
+        value={formData.address}
+        onChange={(e) => setFormData(p => ({ ...p, address: e.target.value }))}
+        placeholder="Branch address"
+      />
+    </div>
+    <div className="space-y-2">
+      <Label htmlFor="branch-phone">Phone</Label>
+      <Input
+        id="branch-phone"
+        value={formData.phone}
+        onChange={(e) => setFormData(p => ({ ...p, phone: e.target.value }))}
+        placeholder="Contact number"
+      />
+    </div>
+    <div className="flex items-center gap-3">
+      <Switch
+        id="branch-active"
+        checked={formData.is_active}
+        onCheckedChange={(v) => setFormData(p => ({ ...p, is_active: v }))}
+      />
+      <Label htmlFor="branch-active">Active</Label>
+    </div>
+    <DialogFooter>
+      <Button
+        onClick={onSubmit}
+        disabled={isSubmitting || !formData.name || !formData.code}
+        className="btn-gov-primary"
+      >
+        {isSubmitting ? "Saving..." : submitLabel}
+      </Button>
+    </DialogFooter>
+  </div>
+));
+BranchForm.displayName = "BranchForm";
+
+const INITIAL_FORM: BranchFormData = { name: "", code: "", address: "", phone: "", is_active: true };
+
 const BranchManagement = () => {
   const { branches, isLoading, addBranch, isAdding, updateBranch, isUpdating, deleteBranch, isDeleting } = useBranches();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingBranch, setEditingBranch] = useState<Branch | null>(null);
-  const [formData, setFormData] = useState({ name: "", code: "", address: "", phone: "", is_active: true });
+  const [formData, setFormData] = useState<BranchFormData>(INITIAL_FORM);
 
-  const resetForm = () => setFormData({ name: "", code: "", address: "", phone: "", is_active: true });
+  const resetForm = useCallback(() => setFormData(INITIAL_FORM), []);
 
-  const handleCreate = () => {
-    if (!formData.name || !formData.code) return;
+  // Formatting (trim) happens only on submit, never on keystroke
+  const handleCreate = useCallback(() => {
+    if (!formData.name.trim() || !formData.code.trim()) return;
     addBranch(
-      { name: formData.name, code: formData.code, address: formData.address || undefined, phone: formData.phone || undefined, is_active: formData.is_active },
+      { name: formData.name.trim(), code: formData.code.trim(), address: formData.address.trim() || undefined, phone: formData.phone.trim() || undefined, is_active: formData.is_active },
       { onSuccess: () => { setIsCreateOpen(false); resetForm(); } }
     );
-  };
+  }, [formData, addBranch, resetForm]);
 
-  const handleUpdate = () => {
+  const handleUpdate = useCallback(() => {
     if (!editingBranch) return;
     updateBranch(
-      { id: editingBranch.id, name: formData.name, code: formData.code, address: formData.address || undefined, phone: formData.phone || undefined, is_active: formData.is_active },
+      { id: editingBranch.id, name: formData.name.trim(), code: formData.code.trim(), address: formData.address.trim() || undefined, phone: formData.phone.trim() || undefined, is_active: formData.is_active },
       { onSuccess: () => { setEditingBranch(null); resetForm(); } }
     );
-  };
+  }, [editingBranch, formData, updateBranch, resetForm]);
 
-  const openEdit = (branch: Branch) => {
+  const openEdit = useCallback((branch: Branch) => {
     setFormData({ name: branch.name, code: branch.code, address: branch.address || "", phone: branch.phone || "", is_active: branch.is_active });
     setEditingBranch(branch);
-  };
-
-  const BranchForm = ({ onSubmit, isSubmitting, submitLabel }: { onSubmit: () => void; isSubmitting: boolean; submitLabel: string }) => (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="name">Branch Name *</Label>
-          <Input id="name" value={formData.name} onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Head Office" />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="code">Branch Code *</Label>
-          <Input id="code" value={formData.code} onChange={(e) => setFormData(p => ({ ...p, code: e.target.value }))} placeholder="e.g. HQ" />
-        </div>
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="address">Address</Label>
-        <Input id="address" value={formData.address} onChange={(e) => setFormData(p => ({ ...p, address: e.target.value }))} placeholder="Branch address" />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="phone">Phone</Label>
-        <Input id="phone" value={formData.phone} onChange={(e) => setFormData(p => ({ ...p, phone: e.target.value }))} placeholder="Contact number" />
-      </div>
-      <div className="flex items-center gap-3">
-        <Switch id="is_active" checked={formData.is_active} onCheckedChange={(v) => setFormData(p => ({ ...p, is_active: v }))} />
-        <Label htmlFor="is_active">Active</Label>
-      </div>
-      <DialogFooter>
-        <Button onClick={onSubmit} disabled={isSubmitting || !formData.name || !formData.code} className="btn-gov-primary">
-          {isSubmitting ? "Saving..." : submitLabel}
-        </Button>
-      </DialogFooter>
-    </div>
-  );
+  }, []);
 
   if (isLoading) {
     return <div className="space-y-3">{[1, 2, 3].map(i => <div key={i} className="h-20 skeleton rounded" />)}</div>;
@@ -95,7 +152,7 @@ const BranchManagement = () => {
               <DialogTitle>Create New Branch</DialogTitle>
               <DialogDescription>Add a new branch to the organization.</DialogDescription>
             </DialogHeader>
-            <BranchForm onSubmit={handleCreate} isSubmitting={isAdding} submitLabel="Create Branch" />
+            <BranchForm formData={formData} setFormData={setFormData} onSubmit={handleCreate} isSubmitting={isAdding} submitLabel="Create Branch" />
           </DialogContent>
         </Dialog>
       </CardHeader>
@@ -137,7 +194,7 @@ const BranchManagement = () => {
                         <DialogTitle>Edit Branch</DialogTitle>
                         <DialogDescription>Update branch information.</DialogDescription>
                       </DialogHeader>
-                      <BranchForm onSubmit={handleUpdate} isSubmitting={isUpdating} submitLabel="Save Changes" />
+                      <BranchForm formData={formData} setFormData={setFormData} onSubmit={handleUpdate} isSubmitting={isUpdating} submitLabel="Save Changes" />
                     </DialogContent>
                   </Dialog>
                   <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive/10" onClick={() => deleteBranch(branch.id)} disabled={isDeleting}>
