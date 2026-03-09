@@ -58,7 +58,7 @@ const Index = () => {
        case "repairs":
          return <RepairWorkflow />;
       case "branches":
-        return isAdmin ? <div className="space-y-6"><BranchManagement /><BranchAssignmentApproval /></div> : <Dashboard onNavigate={setActiveView} />;
+        return (isAdmin || isBranchHead) ? <div className="space-y-6"><BranchManagement /><BranchAssignmentApproval /></div> : <Dashboard onNavigate={setActiveView} />;
       case "admin":
         return isAdmin ? <AdminPortal /> : <Dashboard onNavigate={setActiveView} />;
       case "profile":
