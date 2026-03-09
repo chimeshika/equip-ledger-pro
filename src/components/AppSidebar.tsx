@@ -32,6 +32,7 @@ import {
 
 interface AppSidebarProps {
   isAdmin: boolean;
+  isBranchHead?: boolean;
   activeView: string;
   onViewChange: (view: string) => void;
 }
@@ -90,7 +91,7 @@ const userItems = [
 }];
 
 
-export function AppSidebar({ isAdmin, activeView, onViewChange }: AppSidebarProps) {
+export function AppSidebar({ isAdmin, isBranchHead, activeView, onViewChange }: AppSidebarProps) {
   const { signOut } = useAuth();
   const { requests } = useRepairRequests('all');
   const pendingRepairCount = requests.filter((r) => r.status === 'pending').length;
@@ -162,37 +163,39 @@ export function AppSidebar({ isAdmin, activeView, onViewChange }: AppSidebarProp
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {isAdmin &&
+        {(isAdmin || isBranchHead) &&
         <SidebarGroup>
             <SidebarGroupLabel className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider px-3 mb-2 mt-4">
               Administration
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu className="space-y-1">
-                {adminItems.map((item) =>
-              <SidebarMenuItem key={item.key}>
+                {/* Branches visible to both admin and branch_head */}
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={activeView === 'branches'}
+                    className={`transition-colors duration-150 rounded py-2.5 px-3 ${activeView === 'branches' ? 'bg-sidebar-accent text-sidebar-foreground font-medium border-l-2 border-accent' : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'}`}>
+                    <button onClick={() => onViewChange('branches')} className="flex items-center gap-3 w-full text-left">
+                      <Building2 className="h-4 w-4" />
+                      <span className="text-sm">Branches</span>
+                    </button>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                {/* Admin Portal only for admin */}
+                {isAdmin && (
+                  <SidebarMenuItem>
                     <SidebarMenuButton
-                  asChild
-                  isActive={activeView === item.key}
-                  className={`
-                        transition-colors duration-150
-                        rounded py-2.5 px-3
-                        ${activeView === item.key ?
-                  'bg-sidebar-accent text-sidebar-foreground font-medium border-l-2 border-accent' :
-                  'text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'}
-                      `
-                  }>
-
-                      <button
-                    onClick={() => onViewChange(item.key)}
-                    className="flex items-center gap-3 w-full text-left">
-
-                        <item.icon className="h-4 w-4" />
-                        <span className="text-sm">{item.title}</span>
+                      asChild
+                      isActive={activeView === 'admin'}
+                      className={`transition-colors duration-150 rounded py-2.5 px-3 ${activeView === 'admin' ? 'bg-sidebar-accent text-sidebar-foreground font-medium border-l-2 border-accent' : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'}`}>
+                      <button onClick={() => onViewChange('admin')} className="flex items-center gap-3 w-full text-left">
+                        <Shield className="h-4 w-4" />
+                        <span className="text-sm">Admin Portal</span>
                       </button>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-              )}
+                )}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

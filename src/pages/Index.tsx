@@ -32,6 +32,15 @@ const Index = () => {
     },
     enabled: !!user,
   });
+  const { data: isBranchHead } = useQuery({
+    queryKey: ['isBranchHead', user?.id],
+    queryFn: async () => {
+      if (!user) return false;
+      const { data } = await supabase.rpc('has_role', { _user_id: user.id, _role: 'branch_head' });
+      return !!data;
+    },
+    enabled: !!user,
+  });
   const [activeView, setActiveView] = useState("dashboard");
 
   const renderActiveView = () => {
@@ -49,7 +58,7 @@ const Index = () => {
        case "repairs":
          return <RepairWorkflow />;
       case "branches":
-        return isAdmin ? <div className="space-y-6"><BranchManagement /><BranchAssignmentApproval /></div> : <Dashboard onNavigate={setActiveView} />;
+        return (isAdmin || isBranchHead) ? <div className="space-y-6"><BranchManagement /><BranchAssignmentApproval /></div> : <Dashboard onNavigate={setActiveView} />;
       case "admin":
         return isAdmin ? <AdminPortal /> : <Dashboard onNavigate={setActiveView} />;
       case "profile":
@@ -90,7 +99,8 @@ const Index = () => {
         <GovernmentHeader />
         <div className="flex flex-1 gradient-primary">
           <AppSidebar 
-            isAdmin={isAdmin} 
+            isAdmin={!!isAdmin} 
+            isBranchHead={!!isBranchHead}
             activeView={activeView} 
             onViewChange={setActiveView} 
           />

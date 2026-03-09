@@ -5,15 +5,7 @@ import { UserCheck, Check, X, Clock, Building2, Trash2 } from "lucide-react";
 import { useBranchAssignments } from "@/hooks/useBranches";
 import type { Database } from "@/integrations/supabase/types";
 
-type AppRole = Database['public']['Enums']['app_role'];
-
-const roleLabels: Record<AppRole, string> = {
-  admin: "Administrator",
-  user: "User",
-  branch_head: "Branch Head",
-  it_unit: "IT Unit",
-  officer: "Officer",
-};
+import { ROLE_LABELS } from "@/lib/roles";
 
 const statusStyles: Record<string, string> = {
   pending: "badge-gov-warning",
@@ -62,7 +54,7 @@ const BranchAssignmentApproval = () => {
                       <Building2 className="h-3 w-3" />
                       {assignment.branch?.name || "Unknown Branch"}
                     </span>
-                    <Badge variant="outline" className="text-xs">{roleLabels[assignment.requested_role]}</Badge>
+                    <Badge variant="outline" className="text-xs">{ROLE_LABELS[assignment.requested_role]}</Badge>
                   </div>
                   {/* New fields */}
                   <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs text-muted-foreground">
@@ -118,7 +110,7 @@ const BranchAssignmentApproval = () => {
                       <Building2 className="h-3 w-3" />
                       {assignment.branch?.name || "Unknown Branch"}
                     </span>
-                    <Badge variant="outline" className="text-xs">{roleLabels[assignment.requested_role]}</Badge>
+                    <Badge variant="outline" className="text-xs">{ROLE_LABELS[assignment.requested_role]}</Badge>
                   </div>
                   <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs text-muted-foreground">
                     {assignment.designation && (

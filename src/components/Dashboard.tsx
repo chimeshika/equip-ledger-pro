@@ -1,12 +1,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import EquipmentCard from "./EquipmentCard";
 import { useEquipment } from "@/hooks/useEquipment";
 import { useBranches, useUserBranchAssignment } from "@/hooks/useBranches";
 import { useCurrentUser } from "@/hooks/useProfiles";
 import { useRepairRequests } from "@/hooks/useRepairRequests";
-import { TrendingUp, TrendingDown, Package, AlertTriangle, CheckCircle, Activity, Building2, Wrench, Clock, CircleCheck } from "lucide-react";
+import { BranchFilter } from "./BranchFilter";
+import { hasGlobalAccess } from "@/lib/roles";
+import { TrendingUp, TrendingDown, Package, AlertTriangle, CheckCircle, Activity, Wrench, Clock, CircleCheck } from "lucide-react";
 import { useState } from "react";
 
 interface DashboardProps {
@@ -21,13 +22,7 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
   const { requests: repairRequests, isLoading: repairsLoading } = useRepairRequests('all');
   const [selectedBranchId, setSelectedBranchId] = useState<string>("all");
 
-  // UI-only checks — actual authorization is enforced by RLS policies on the database
-  const isAdmin = currentUser?.role === 'admin';
-  const isItUnit = currentUser?.role === 'it_unit';
-  const canFilterBranch = isAdmin || isItUnit;
-
-  // Get user's branch name for display
-  const userBranch = branches.find(b => b.id === assignment?.branch_id);
+  const canFilterBranch = hasGlobalAccess(currentUser?.role);
 
   // Filter equipment by selected branch (admins/IT) or show all (RLS handles filtering for others)
   const filteredEquipment = canFilterBranch && selectedBranchId !== "all"
@@ -99,38 +94,7 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Branch Filter / Indicator */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Building2 className="h-5 w-5" />
-          {canFilterBranch ? (
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Branch:</span>
-              <Select value={selectedBranchId} onValueChange={setSelectedBranchId}>
-                <SelectTrigger className="w-[200px] h-9">
-                  <SelectValue placeholder="All Branches" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Branches</SelectItem>
-                  {branches.filter(b => b.is_active).map(branch => (
-                    <SelectItem key={branch.id} value={branch.id}>
-                      {branch.name} ({branch.code})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          ) : (
-            <span className="text-sm font-medium">
-              {userBranch ? `${userBranch.name} (${userBranch.code})` : 'No branch assigned'}
-            </span>
-          )}
-        </div>
-        {canFilterBranch && selectedBranchId !== "all" && (
-          <Badge variant="secondary" className="text-xs">
-            Filtered
-          </Badge>
-        )}
-      </div>
+      <BranchFilter value={selectedBranchId} onChange={setSelectedBranchId} />
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
