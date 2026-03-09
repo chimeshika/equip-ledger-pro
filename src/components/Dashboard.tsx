@@ -1,13 +1,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import EquipmentCard from "./EquipmentCard";
 import { useEquipment } from "@/hooks/useEquipment";
 import { useBranches, useUserBranchAssignment } from "@/hooks/useBranches";
 import { useCurrentUser } from "@/hooks/useProfiles";
 import { useRepairRequests } from "@/hooks/useRepairRequests";
-import { TrendingUp, TrendingDown, Package, AlertTriangle, CheckCircle, Activity, Building2, Wrench, Clock, CircleCheck } from "lucide-react";
-import { useState } from "react";
+import { BranchFilter } from "./BranchFilter";
+import { hasGlobalAccess } from "@/lib/roles";
+import { TrendingUp, TrendingDown, Package, AlertTriangle, CheckCircle, Activity, Wrench, Clock, CircleCheck } from "lucide-react";
 
 interface DashboardProps {
   onNavigate?: (view: string) => void;
