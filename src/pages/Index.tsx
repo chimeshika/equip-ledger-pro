@@ -32,6 +32,15 @@ const Index = () => {
     },
     enabled: !!user,
   });
+  const { data: isBranchHead } = useQuery({
+    queryKey: ['isBranchHead', user?.id],
+    queryFn: async () => {
+      if (!user) return false;
+      const { data } = await supabase.rpc('has_role', { _user_id: user.id, _role: 'branch_head' });
+      return !!data;
+    },
+    enabled: !!user,
+  });
   const [activeView, setActiveView] = useState("dashboard");
 
   const renderActiveView = () => {
