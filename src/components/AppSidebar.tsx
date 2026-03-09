@@ -91,7 +91,7 @@ const userItems = [
 }];
 
 
-export function AppSidebar({ isAdmin, activeView, onViewChange }: AppSidebarProps) {
+export function AppSidebar({ isAdmin, isBranchHead, activeView, onViewChange }: AppSidebarProps) {
   const { signOut } = useAuth();
   const { requests } = useRepairRequests('all');
   const pendingRepairCount = requests.filter((r) => r.status === 'pending').length;
