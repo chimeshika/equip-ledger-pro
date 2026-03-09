@@ -13,8 +13,8 @@
    const [activeTab, setActiveTab] = useState('new-request');
  
     // UI-only checks — actual authorization is enforced by RLS policies on the database
-    const isBranchHead = currentUser?.role === 'branch_head' || currentUser?.role === 'admin';
-    const isITUnit = currentUser?.role === 'it_unit' || currentUser?.role === 'admin';
+    const isBranchHead = currentUser?.role === 'branch_head' || currentUser?.role === 'admin' || currentUser?.role === 'director';
+    const isITUnit = currentUser?.role === 'it_unit' || currentUser?.role === 'it_assistant' || hasGlobalAccess(currentUser?.role);
  
    return (
      <div className="space-y-6">
