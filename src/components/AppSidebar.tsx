@@ -32,6 +32,7 @@ import {
 
 interface AppSidebarProps {
   isAdmin: boolean;
+  isBranchHead?: boolean;
   activeView: string;
   onViewChange: (view: string) => void;
 }
