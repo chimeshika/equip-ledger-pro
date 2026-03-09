@@ -5,6 +5,7 @@
  import { BranchHeadApproval } from './BranchHeadApproval';
  import { ITUnitQueue } from './ITUnitQueue';
  import { useCurrentUser } from '@/hooks/useProfiles';
+ import { hasGlobalAccess } from '@/lib/roles';
  import { PlusCircle, FileText, ClipboardCheck, Wrench } from 'lucide-react';
  
  export function RepairWorkflow() {
