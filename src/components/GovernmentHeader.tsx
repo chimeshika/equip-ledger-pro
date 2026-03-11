@@ -18,7 +18,7 @@ export const GovernmentHeader = ({ className = "" }: GovernmentHeaderProps) => {
             <h1 className="text-lg font-semibold text-foreground leading-tight md:text-3xl">                                     Equipment Manegment System                                                                                    
 
             </h1>
-            <p className="text-muted-foreground mt-1 text-base">                                        Home Affairs Section  | Minstry of Public Service, Provincial Councils and Local Government
+            <p className="text-muted-foreground mt-1 text-base text-center">                                        Home Affairs Section  | Minstry of Public Service, Provincial Councils and Local Government
 
             </p>
           </div>
