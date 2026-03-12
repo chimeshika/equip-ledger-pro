@@ -26,8 +26,6 @@ export interface UserBranchAssignment {
   approved_by?: string;
   approved_at?: string;
   designation?: string | null;
-  post_order?: number | null;
-  supervisor_id?: string | null;
   created_at: string;
   updated_at: string;
   branch?: Branch;
@@ -36,10 +34,6 @@ export interface UserBranchAssignment {
     email: string;
     full_name?: string;
   };
-  supervisor?: {
-    id: string;
-    full_name?: string | null;
-  } | null;
 }
 
 export const useBranches = () => {
@@ -155,8 +149,8 @@ export const useUserBranchAssignment = () => {
   });
 
   const requestAssignmentMutation = useMutation({
-    mutationFn: async ({ branchId, requestedRole, designation, postOrder, supervisorId }: {
-      branchId: string; requestedRole: AppRole; designation?: string; postOrder?: number; supervisorId?: string;
+    mutationFn: async ({ branchId, requestedRole, designation }: {
+      branchId: string; requestedRole: AppRole; designation?: string;
     }) => {
       if (!user) throw new Error('User not authenticated');
       const { data, error } = await supabase
@@ -167,8 +161,6 @@ export const useUserBranchAssignment = () => {
           requested_role: requestedRole,
           status: 'pending',
           designation: designation || null,
-          post_order: postOrder || null,
-          supervisor_id: supervisorId || null,
         } as any)
         .select()
         .single();
@@ -211,22 +203,17 @@ export const useBranchAssignments = () => {
 
       // Fetch profiles for users
       const userIds = assignmentsData.map(a => a.user_id);
-      const supervisorIds = assignmentsData.map(a => (a as any).supervisor_id).filter(Boolean);
-      const allIds = [...new Set([...userIds, ...supervisorIds])];
 
       const { data: profilesData } = await supabase
         .from('profiles')
         .select('id, email, full_name')
-        .in('id', allIds);
+        .in('id', userIds);
 
       const profilesMap = new Map(profilesData?.map(p => [p.id, p]) || []);
 
       return assignmentsData.map(assignment => ({
         ...assignment,
         profile: profilesMap.get(assignment.user_id),
-        supervisor: (assignment as any).supervisor_id
-          ? profilesMap.get((assignment as any).supervisor_id) || null
-          : null,
       })) as unknown as UserBranchAssignment[];
     },
     enabled: !!user,

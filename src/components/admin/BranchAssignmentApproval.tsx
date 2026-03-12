@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { UserCheck, Check, X, Clock, Building2, Trash2 } from "lucide-react";
 import { useBranchAssignments } from "@/hooks/useBranches";
-import type { Database } from "@/integrations/supabase/types";
 
 import { ROLE_LABELS } from "@/lib/roles";
 
@@ -56,18 +55,11 @@ const BranchAssignmentApproval = () => {
                     </span>
                     <Badge variant="outline" className="text-xs">{ROLE_LABELS[assignment.requested_role]}</Badge>
                   </div>
-                  {/* New fields */}
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs text-muted-foreground">
-                    {assignment.designation && (
-                      <span><span className="font-medium text-foreground">Designation:</span> {assignment.designation}</span>
-                    )}
-                    {assignment.post_order && (
-                      <span><span className="font-medium text-foreground">Post Order:</span> {assignment.post_order}</span>
-                    )}
-                    {assignment.supervisor && (
-                      <span><span className="font-medium text-foreground">Supervisor:</span> {assignment.supervisor.full_name || 'N/A'}</span>
-                    )}
-                  </div>
+                  {assignment.designation && (
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      <span className="font-medium text-foreground">Designation:</span> {assignment.designation}
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
@@ -112,17 +104,11 @@ const BranchAssignmentApproval = () => {
                     </span>
                     <Badge variant="outline" className="text-xs">{ROLE_LABELS[assignment.requested_role]}</Badge>
                   </div>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs text-muted-foreground">
-                    {assignment.designation && (
-                      <span><span className="font-medium text-foreground">Designation:</span> {assignment.designation}</span>
-                    )}
-                    {assignment.post_order && (
-                      <span><span className="font-medium text-foreground">Post Order:</span> {assignment.post_order}</span>
-                    )}
-                    {assignment.supervisor && (
-                      <span><span className="font-medium text-foreground">Supervisor:</span> {assignment.supervisor.full_name || 'N/A'}</span>
-                    )}
-                  </div>
+                  {assignment.designation && (
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      <span className="font-medium text-foreground">Designation:</span> {assignment.designation}
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={statusStyles[assignment.status] || "badge-gov-info"}>
