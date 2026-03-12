@@ -209,22 +209,17 @@ export const useBranchAssignments = () => {
 
       // Fetch profiles for users
       const userIds = assignmentsData.map(a => a.user_id);
-      const supervisorIds = assignmentsData.map(a => (a as any).supervisor_id).filter(Boolean);
-      const allIds = [...new Set([...userIds, ...supervisorIds])];
 
       const { data: profilesData } = await supabase
         .from('profiles')
         .select('id, email, full_name')
-        .in('id', allIds);
+        .in('id', userIds);
 
       const profilesMap = new Map(profilesData?.map(p => [p.id, p]) || []);
 
       return assignmentsData.map(assignment => ({
         ...assignment,
         profile: profilesMap.get(assignment.user_id),
-        supervisor: (assignment as any).supervisor_id
-          ? profilesMap.get((assignment as any).supervisor_id) || null
-          : null,
       })) as unknown as UserBranchAssignment[];
     },
     enabled: !!user,
