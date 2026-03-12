@@ -21,7 +21,7 @@ export interface UserBranchAssignment {
   id: string;
   user_id: string;
   branch_id: string;
-  requested_role: 'admin' | 'user' | 'branch_head' | 'it_unit' | 'officer';
+  requested_role: AppRole;
   status: string;
   approved_by?: string;
   approved_at?: string;
@@ -102,7 +102,6 @@ export const useApprovedUsers = () => {
     queryKey: ['approvedUsers'],
     queryFn: async () => {
       if (!user) return [];
-      // Get all approved assignments to find their user IDs and designations
       const { data: assignments, error: aErr } = await supabase
         .from('user_branch_assignments')
         .select('user_id, designation')
@@ -201,7 +200,7 @@ export const useBranchAssignments = () => {
       if (error) { if (import.meta.env.DEV) console.error('Error fetching branch assignments:', error); throw error; }
       if (!assignmentsData || assignmentsData.length === 0) return [];
 
-      // Fetch profiles for users
+      // Fetch profiles for users to resolve full_name
       const userIds = assignmentsData.map(a => a.user_id);
 
       const { data: profilesData } = await supabase
@@ -220,14 +219,36 @@ export const useBranchAssignments = () => {
   });
 
   const approveAssignmentMutation = useMutation({
-    mutationFn: async ({ assignmentId, userId, role }: { assignmentId: string; userId: string; role: AppRole }) => {
+    mutationFn: async ({ assignmentId, userId, role, branchId }: {
+      assignmentId: string; userId: string; role: AppRole; branchId: string;
+    }) => {
       if (!user) throw new Error('User not authenticated');
+
+      // Validate: if viewer is branch_head, confirm the target belongs to their branch
+      const { data: viewerIsAdmin } = await supabase.rpc('has_role', { _user_id: user.id, _role: 'admin' });
+      if (!viewerIsAdmin) {
+        const { data: viewerBranch } = await supabase.rpc('get_user_branch', { _user_id: user.id });
+        if (viewerBranch !== branchId) {
+          throw new Error('You can only approve users assigned to your branch.');
+        }
+        // Branch heads can only approve 'user' role
+        if (role !== 'user') {
+          throw new Error('Branch Heads can only approve standard User requests.');
+        }
+      } else {
+        // Admin can only approve branch_head and admin requests
+        if (role !== 'branch_head' && role !== 'admin') {
+          throw new Error('Admins approve Branch Head and Admin requests only. User requests should be approved by the Branch Head.');
+        }
+      }
+
       const { error: assignmentError } = await supabase
         .from('user_branch_assignments')
         .update({ status: 'approved', approved_by: user.id, approved_at: new Date().toISOString() })
         .eq('id', assignmentId);
       if (assignmentError) throw assignmentError;
 
+      // Set the user's role
       await supabase.from('user_roles').delete().eq('user_id', userId);
       const { error: roleError } = await supabase.from('user_roles').insert({ user_id: userId, role });
       if (roleError) throw roleError;
@@ -270,7 +291,7 @@ export const useBranchAssignments = () => {
         .delete()
         .eq('id', assignmentId);
       if (error) throw error;
-      // Also clean up the user's role back to default 'user'
+      // Reset user role to default 'user'
       await supabase.from('user_roles').delete().eq('user_id', userId);
       await supabase.from('user_roles').insert({ user_id: userId, role: 'user' as AppRole });
     },

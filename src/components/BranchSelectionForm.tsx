@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,6 +15,7 @@ import type { Database } from '@/integrations/supabase/types';
 
 type AppRole = Database['public']['Enums']['app_role'];
 
+// Only these three roles are available during registration
 const ROLE_OPTIONS: { value: AppRole; label: string }[] = [
   { value: 'admin', label: 'Admin' },
   { value: 'branch_head', label: 'Branch Head' },
@@ -84,8 +84,8 @@ export const BranchSelectionForm = () => {
                   <div className="bg-muted/50 rounded-md p-3 text-sm space-y-1 text-left">
                     <p><span className="font-medium">Branch:</span> {assignment.branch.name} ({assignment.branch.code})</p>
                     <p><span className="font-medium">Requested Role:</span> <Badge variant="outline">{assignment.requested_role}</Badge></p>
-                    {(assignment as any).designation && (
-                      <p><span className="font-medium">Designation:</span> {(assignment as any).designation}</p>
+                    {assignment.designation && (
+                      <p><span className="font-medium">Designation:</span> {assignment.designation}</p>
                     )}
                   </div>
                 )}

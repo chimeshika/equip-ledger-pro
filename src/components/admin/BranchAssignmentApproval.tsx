@@ -3,7 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { UserCheck, Check, X, Clock, Building2, Trash2 } from "lucide-react";
 import { useBranchAssignments } from "@/hooks/useBranches";
-
+import { useAuth } from "@/contexts/AuthContext";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { ROLE_LABELS } from "@/lib/roles";
 
 const statusStyles: Record<string, string> = {
@@ -13,10 +15,47 @@ const statusStyles: Record<string, string> = {
 };
 
 const BranchAssignmentApproval = () => {
+  const { user } = useAuth();
   const { assignments, isLoading, approveAssignment, isApproving, rejectAssignment, isRejecting, deleteAssignment, isDeleting } = useBranchAssignments();
 
-  const pending = assignments.filter(a => a.status === "pending");
-  const processed = assignments.filter(a => a.status !== "pending");
+  // Check viewer's role & branch
+  const { data: viewerRole } = useQuery({
+    queryKey: ['viewerAdminCheck', user?.id],
+    queryFn: async () => {
+      if (!user) return { isAdmin: false, isBranchHead: false, branchId: null as string | null };
+      const [{ data: admin }, { data: bh }] = await Promise.all([
+        supabase.rpc('has_role', { _user_id: user.id, _role: 'admin' }),
+        supabase.rpc('has_role', { _user_id: user.id, _role: 'branch_head' }),
+      ]);
+      let branchId: string | null = null;
+      if (bh) {
+        const { data } = await supabase.rpc('get_user_branch', { _user_id: user.id });
+        branchId = data;
+      }
+      return { isAdmin: !!admin, isBranchHead: !!bh, branchId };
+    },
+    enabled: !!user,
+  });
+
+  /**
+   * Filter assignments based on viewer role:
+   * - Admin: sees only branch_head/admin requests (approves branch heads)
+   * - Branch Head: sees only 'user' requests for THEIR branch
+   */
+  const filteredAssignments = assignments.filter(a => {
+    if (viewerRole?.isAdmin) {
+      // Admin approves branch_head and admin requests only
+      return a.requested_role === 'branch_head' || a.requested_role === 'admin';
+    }
+    if (viewerRole?.isBranchHead && viewerRole.branchId) {
+      // Branch Head approves only 'user' requests for their branch
+      return a.requested_role === 'user' && a.branch_id === viewerRole.branchId;
+    }
+    return false;
+  });
+
+  const pending = filteredAssignments.filter(a => a.status === "pending");
+  const processed = filteredAssignments.filter(a => a.status !== "pending");
 
   if (isLoading) {
     return <div className="space-y-3">{[1, 2, 3].map(i => <div key={i} className="h-20 skeleton rounded" />)}</div>;
@@ -32,7 +71,11 @@ const BranchAssignmentApproval = () => {
             <Badge variant="destructive" className="ml-2">{pending.length}</Badge>
           )}
         </CardTitle>
-        <CardDescription>Review and approve user branch assignment requests</CardDescription>
+        <CardDescription>
+          {viewerRole?.isAdmin
+            ? "Review Branch Head and Admin assignment requests"
+            : "Review User assignment requests for your branch"}
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Pending Requests */}
@@ -53,7 +96,7 @@ const BranchAssignmentApproval = () => {
                       <Building2 className="h-3 w-3" />
                       {assignment.branch?.name || "Unknown Branch"}
                     </span>
-                    <Badge variant="outline" className="text-xs">{ROLE_LABELS[assignment.requested_role]}</Badge>
+                    <Badge variant="outline" className="text-xs">{ROLE_LABELS[assignment.requested_role] || assignment.requested_role}</Badge>
                   </div>
                   {assignment.designation && (
                     <div className="mt-1 text-xs text-muted-foreground">
@@ -65,7 +108,12 @@ const BranchAssignmentApproval = () => {
                   <Button
                     size="sm"
                     className="btn-gov-primary gap-1.5"
-                    onClick={() => approveAssignment({ assignmentId: assignment.id, userId: assignment.user_id, role: assignment.requested_role })}
+                    onClick={() => approveAssignment({
+                      assignmentId: assignment.id,
+                      userId: assignment.user_id,
+                      role: assignment.requested_role,
+                      branchId: assignment.branch_id,
+                    })}
                     disabled={isApproving}
                   >
                     <Check className="h-3.5 w-3.5" /> Approve
@@ -85,7 +133,7 @@ const BranchAssignmentApproval = () => {
           </div>
         )}
 
-        {/* Processed Requests */}
+        {/* Processed Requests - shows only Name, Branch, Role */}
         {processed.length > 0 && (
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
@@ -102,13 +150,8 @@ const BranchAssignmentApproval = () => {
                       <Building2 className="h-3 w-3" />
                       {assignment.branch?.name || "Unknown Branch"}
                     </span>
-                    <Badge variant="outline" className="text-xs">{ROLE_LABELS[assignment.requested_role]}</Badge>
+                    <Badge variant="outline" className="text-xs">{ROLE_LABELS[assignment.requested_role] || assignment.requested_role}</Badge>
                   </div>
-                  {assignment.designation && (
-                    <div className="mt-1 text-xs text-muted-foreground">
-                      <span className="font-medium text-foreground">Designation:</span> {assignment.designation}
-                    </div>
-                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={statusStyles[assignment.status] || "badge-gov-info"}>
@@ -129,7 +172,7 @@ const BranchAssignmentApproval = () => {
           </div>
         )}
 
-        {assignments.length === 0 && (
+        {filteredAssignments.length === 0 && (
           <div className="text-center py-12 text-muted-foreground">
             <UserCheck className="h-12 w-12 mx-auto mb-3 opacity-40" />
             <p className="font-medium">No assignment requests</p>
