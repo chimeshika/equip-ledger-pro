@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { GovernmentHeader } from '@/components/GovernmentHeader';
 import { GovernmentFooter } from '@/components/GovernmentFooter';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { useBranches, useUserBranchAssignment, useApprovedUsers } from '@/hooks/useBranches';
+import { useBranches, useUserBranchAssignment } from '@/hooks/useBranches';
 import { useAuth } from '@/contexts/AuthContext';
 import { Building2, Clock, XCircle, LogOut } from 'lucide-react';
 import type { Database } from '@/integrations/supabase/types';
@@ -17,20 +17,17 @@ import type { Database } from '@/integrations/supabase/types';
 type AppRole = Database['public']['Enums']['app_role'];
 
 const ROLE_OPTIONS: { value: AppRole; label: string }[] = [
-  { value: 'officer', label: 'Officer' },
+  { value: 'admin', label: 'Admin' },
   { value: 'branch_head', label: 'Branch Head' },
-  { value: 'it_unit', label: 'IT Unit' },
+  { value: 'user', label: 'User' },
 ];
 
 export const BranchSelectionForm = () => {
   const [selectedBranch, setSelectedBranch] = useState('');
-  const [selectedRole, setSelectedRole] = useState<AppRole>('officer');
+  const [selectedRole, setSelectedRole] = useState<AppRole>('user');
   const [designation, setDesignation] = useState('');
-  const [postOrder, setPostOrder] = useState('');
-  const [supervisorId, setSupervisorId] = useState('');
   const { branches, isLoading: branchesLoading } = useBranches();
   const { assignment, isLoading: assignmentLoading, requestAssignment, isRequesting } = useUserBranchAssignment();
-  const { data: approvedUsers = [] } = useApprovedUsers();
   const { user, signOut } = useAuth();
 
   const activeBranches = branches.filter(b => b.is_active);
@@ -42,16 +39,11 @@ export const BranchSelectionForm = () => {
       branchId: selectedBranch,
       requestedRole: selectedRole,
       designation: designation.trim() || undefined,
-      postOrder: postOrder ? parseInt(postOrder, 10) : undefined,
-      supervisorId: supervisorId || undefined,
     });
   };
 
   const isPending = assignment?.status === 'pending';
   const isRejected = assignment?.status === 'rejected';
-
-  // Filter out current user from supervisor list
-  const supervisorOptions = approvedUsers.filter(u => u.id !== user?.id);
 
   return (
     <div className="min-h-screen bg-background relative flex flex-col">
@@ -69,7 +61,7 @@ export const BranchSelectionForm = () => {
               Branch Assignment
             </CardTitle>
             <CardDescription>
-              Select your branch, enter your designation, and choose your reporting officer
+              Select your branch, role, and enter your designation
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -85,7 +77,7 @@ export const BranchSelectionForm = () => {
                 <div>
                   <h3 className="font-semibold text-foreground">Request Pending</h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Your branch assignment request is awaiting admin approval.
+                    Your branch assignment request is awaiting approval.
                   </p>
                 </div>
                 {assignment?.branch && (
@@ -94,9 +86,6 @@ export const BranchSelectionForm = () => {
                     <p><span className="font-medium">Requested Role:</span> <Badge variant="outline">{assignment.requested_role}</Badge></p>
                     {(assignment as any).designation && (
                       <p><span className="font-medium">Designation:</span> {(assignment as any).designation}</p>
-                    )}
-                    {(assignment as any).post_order && (
-                      <p><span className="font-medium">Post Order:</span> {(assignment as any).post_order}</p>
                     )}
                   </div>
                 )}
@@ -124,11 +113,6 @@ export const BranchSelectionForm = () => {
                   setSelectedRole={setSelectedRole}
                   designation={designation}
                   setDesignation={setDesignation}
-                  postOrder={postOrder}
-                  setPostOrder={setPostOrder}
-                  supervisorId={supervisorId}
-                  setSupervisorId={setSupervisorId}
-                  supervisorOptions={supervisorOptions}
                   onSubmit={handleSubmit}
                   isRequesting={isRequesting}
                 />
@@ -149,11 +133,6 @@ export const BranchSelectionForm = () => {
                   setSelectedRole={setSelectedRole}
                   designation={designation}
                   setDesignation={setDesignation}
-                  postOrder={postOrder}
-                  setPostOrder={setPostOrder}
-                  supervisorId={supervisorId}
-                  setSupervisorId={setSupervisorId}
-                  supervisorOptions={supervisorOptions}
                   onSubmit={handleSubmit}
                   isRequesting={isRequesting}
                 />
@@ -181,11 +160,6 @@ interface BranchRequestFormProps {
   setSelectedRole: (val: AppRole) => void;
   designation: string;
   setDesignation: (val: string) => void;
-  postOrder: string;
-  setPostOrder: (val: string) => void;
-  supervisorId: string;
-  setSupervisorId: (val: string) => void;
-  supervisorOptions: { id: string; full_name: string | null; designation?: string | null }[];
   onSubmit: (e: React.FormEvent) => void;
   isRequesting: boolean;
 }
@@ -198,11 +172,6 @@ const BranchRequestForm = ({
   setSelectedRole,
   designation,
   setDesignation,
-  postOrder,
-  setPostOrder,
-  supervisorId,
-  setSupervisorId,
-  supervisorOptions,
   onSubmit,
   isRequesting,
 }: BranchRequestFormProps) => (
@@ -245,32 +214,6 @@ const BranchRequestForm = ({
         value={designation}
         onChange={(e) => setDesignation(e.target.value)}
       />
-    </div>
-    <div className="space-y-2">
-      <Label htmlFor="postOrder">Post Order / Seniority Number</Label>
-      <Input
-        id="postOrder"
-        type="number"
-        placeholder="e.g. 1"
-        min={1}
-        value={postOrder}
-        onChange={(e) => setPostOrder(e.target.value)}
-      />
-    </div>
-    <div className="space-y-2">
-      <Label htmlFor="supervisor">Select Your Reporting Officer / Supervisor</Label>
-      <Select value={supervisorId} onValueChange={setSupervisorId}>
-        <SelectTrigger id="supervisor">
-          <SelectValue placeholder="Select your supervisor" />
-        </SelectTrigger>
-        <SelectContent>
-          {supervisorOptions.map((u) => (
-            <SelectItem key={u.id} value={u.id}>
-              {u.full_name || 'Unnamed'}{u.designation ? ` — ${u.designation}` : ''}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
     </div>
     <Button type="submit" className="w-full" disabled={!selectedBranch || isRequesting}>
       {isRequesting ? 'Submitting Request...' : 'Request Branch Assignment'}

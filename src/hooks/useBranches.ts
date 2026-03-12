@@ -26,8 +26,6 @@ export interface UserBranchAssignment {
   approved_by?: string;
   approved_at?: string;
   designation?: string | null;
-  post_order?: number | null;
-  supervisor_id?: string | null;
   created_at: string;
   updated_at: string;
   branch?: Branch;
@@ -36,10 +34,6 @@ export interface UserBranchAssignment {
     email: string;
     full_name?: string;
   };
-  supervisor?: {
-    id: string;
-    full_name?: string | null;
-  } | null;
 }
 
 export const useBranches = () => {
