@@ -155,8 +155,8 @@ export const useUserBranchAssignment = () => {
   });
 
   const requestAssignmentMutation = useMutation({
-    mutationFn: async ({ branchId, requestedRole, designation, postOrder, supervisorId }: {
-      branchId: string; requestedRole: AppRole; designation?: string; postOrder?: number; supervisorId?: string;
+    mutationFn: async ({ branchId, requestedRole, designation }: {
+      branchId: string; requestedRole: AppRole; designation?: string;
     }) => {
       if (!user) throw new Error('User not authenticated');
       const { data, error } = await supabase
@@ -167,8 +167,6 @@ export const useUserBranchAssignment = () => {
           requested_role: requestedRole,
           status: 'pending',
           designation: designation || null,
-          post_order: postOrder || null,
-          supervisor_id: supervisorId || null,
         } as any)
         .select()
         .single();
